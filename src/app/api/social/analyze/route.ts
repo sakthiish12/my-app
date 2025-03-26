@@ -5,6 +5,7 @@ import connectToDatabase from '@/lib/db';
 import User from '@/models/User';
 import PricingData from '@/models/PricingData';
 import { auth } from '@clerk/nextjs/server';
+import { SocialAccount } from '@/types/social';
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     // Add or update social account in user profile
     const existingAccountIndex = user.socialAccounts.findIndex(
-      (account) => account.platform === platform && account.username === username
+      (account: SocialAccount) => account.platform === platform && account.username === username
     );
 
     if (existingAccountIndex >= 0) {
