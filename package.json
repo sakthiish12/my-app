@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.9",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.6.7",
     "critters": "^0.0.23",
     "mongodb": "^6.3.0",
@@ -23,6 +24,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.0",
+    "react-icons": "^5.5.0",
     "redis": "^4.6.13",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"
