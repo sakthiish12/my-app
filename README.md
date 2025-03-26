@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SocioPrice
+
+AI-powered pricing intelligence for social media creators. SocioPrice analyzes your audience demographics and engagement metrics to provide personalized pricing recommendations that maximize your revenue.
+
+## Features
+
+- Social media platform integration (Instagram, Facebook, TikTok, LinkedIn, YouTube, Twitter, Pinterest, Threads)
+- AI-powered audience analysis
+- Dynamic pricing recommendations
+- Real-time market trend analysis
+- Integration with popular creator tools
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Authentication**: Clerk
+- **State Management**: Zustand
+- **Form Handling**: React Hook Form, Zod
+- **API Integration**: Axios
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18 or later
+- npm or yarn
+- Git
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/socioprice.git
+cd socioprice
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up environment variables:
+Create a `.env.local` file in the root directory with the following variables:
+```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Deploying to Vercel
 
-## Learn More
+1. Push your code to a GitHub repository
 
-To learn more about Next.js, take a look at the following resources:
+2. Visit [Vercel](https://vercel.com) and sign up/login
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Click "Import Project" and select your repository
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Configure your project:
+   - Framework Preset: Next.js
+   - Environment Variables: Add all variables from `.env.local`
+   - Build Command: `next build`
+   - Output Directory: `.next`
 
-## Deploy on Vercel
+5. Click "Deploy"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Manual Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Build the project:
+```bash
+npm run build
+# or
+yarn build
+```
+
+2. Start the production server:
+```bash
+npm start
+# or
+yarn start
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, email support@socioprice.com or join our Discord community.
