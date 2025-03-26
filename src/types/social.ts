@@ -1,12 +1,20 @@
+export interface Region {
+  name: string;
+  percentage: number;
+  purchasingPowerIndex: number;
+}
+
+export interface DemographicData {
+  totalFollowers: number;
+  regions: Region[];
+  engagementRate: number;
+}
+
 export interface SocialAccount {
   platform: string;
   username: string;
   followers: number;
-  followersData: {
-    totalFollowers: number;
-    regions: Record<string, number>;
-    engagementRate: number;
-  };
+  followersData: DemographicData;
   lastUpdated: Date;
 }
 

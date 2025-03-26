@@ -1,6 +1,8 @@
 // Mock data provider for social media platforms
 // This simulates what we would get from actual social API integrations
 
+import { DemographicData, Region } from '@/types/social';
+
 type SocialPlatform = 'instagram' | 'facebook' | 'tiktok' | 'linkedin' | 'threads' | 'pinterest';
 
 // Simplified demographic data with regions and engagement metrics
@@ -17,17 +19,17 @@ export type SocialDemographicData = {
 };
 
 // Mock demographics for testing various scenarios
-const mockDemographics: Record<string, SocialDemographicData> = {
+const mockDemographics: Record<string, DemographicData> = {
   // US-centric, high-income audience
   usHighIncome: {
     totalFollowers: 25000,
     engagementRate: 0.05,
     regions: [
-      { name: 'United States', percentage: 65 },
-      { name: 'Canada', percentage: 15 },
-      { name: 'United Kingdom', percentage: 10 },
-      { name: 'European Union', percentage: 5 },
-      { name: 'Other', percentage: 5 },
+      { name: 'United States', percentage: 65, purchasingPowerIndex: 100 },
+      { name: 'Canada', percentage: 15, purchasingPowerIndex: 95 },
+      { name: 'United Kingdom', percentage: 10, purchasingPowerIndex: 90 },
+      { name: 'European Union', percentage: 5, purchasingPowerIndex: 85 },
+      { name: 'Other', percentage: 5, purchasingPowerIndex: 70 },
     ],
     ageDistribution: {
       '18-24': 15,
@@ -48,12 +50,12 @@ const mockDemographics: Record<string, SocialDemographicData> = {
     totalFollowers: 85000,
     engagementRate: 0.03,
     regions: [
-      { name: 'United States', percentage: 25 },
-      { name: 'European Union', percentage: 15 },
-      { name: 'India', percentage: 20 },
-      { name: 'Southeast Asia', percentage: 25 },
-      { name: 'Singapore', percentage: 10 },
-      { name: 'Other', percentage: 5 },
+      { name: 'United States', percentage: 25, purchasingPowerIndex: 100 },
+      { name: 'European Union', percentage: 15, purchasingPowerIndex: 85 },
+      { name: 'India', percentage: 20, purchasingPowerIndex: 60 },
+      { name: 'Southeast Asia', percentage: 25, purchasingPowerIndex: 65 },
+      { name: 'Singapore', percentage: 10, purchasingPowerIndex: 95 },
+      { name: 'Other', percentage: 5, purchasingPowerIndex: 70 },
     ],
     ageDistribution: {
       '18-24': 35,
@@ -74,11 +76,11 @@ const mockDemographics: Record<string, SocialDemographicData> = {
     totalFollowers: 8500,
     engagementRate: 0.09,
     regions: [
-      { name: 'United States', percentage: 40 },
-      { name: 'United Kingdom', percentage: 25 },
-      { name: 'Australia', percentage: 15 },
-      { name: 'Canada', percentage: 10 },
-      { name: 'Other', percentage: 10 },
+      { name: 'United States', percentage: 40, purchasingPowerIndex: 100 },
+      { name: 'United Kingdom', percentage: 25, purchasingPowerIndex: 90 },
+      { name: 'Australia', percentage: 15, purchasingPowerIndex: 95 },
+      { name: 'Canada', percentage: 10, purchasingPowerIndex: 95 },
+      { name: 'Other', percentage: 10, purchasingPowerIndex: 70 },
     ],
     ageDistribution: {
       '18-24': 25,
@@ -99,15 +101,15 @@ const mockDemographics: Record<string, SocialDemographicData> = {
     totalFollowers: 1250000,
     engagementRate: 0.025,
     regions: [
-      { name: 'United States', percentage: 30 },
-      { name: 'European Union', percentage: 20 },
-      { name: 'United Kingdom', percentage: 8 },
-      { name: 'Canada', percentage: 7 },
-      { name: 'Australia', percentage: 5 },
-      { name: 'India', percentage: 10 },
-      { name: 'Southeast Asia', percentage: 8 },
-      { name: 'South America', percentage: 7 },
-      { name: 'Other', percentage: 5 },
+      { name: 'United States', percentage: 30, purchasingPowerIndex: 100 },
+      { name: 'European Union', percentage: 20, purchasingPowerIndex: 85 },
+      { name: 'United Kingdom', percentage: 8, purchasingPowerIndex: 90 },
+      { name: 'Canada', percentage: 7, purchasingPowerIndex: 95 },
+      { name: 'Australia', percentage: 5, purchasingPowerIndex: 95 },
+      { name: 'India', percentage: 10, purchasingPowerIndex: 60 },
+      { name: 'Southeast Asia', percentage: 8, purchasingPowerIndex: 65 },
+      { name: 'South America', percentage: 7, purchasingPowerIndex: 75 },
+      { name: 'Other', percentage: 5, purchasingPowerIndex: 70 },
     ],
     ageDistribution: {
       '18-24': 30,
@@ -128,7 +130,7 @@ const mockDemographics: Record<string, SocialDemographicData> = {
 export function getMockFollowerData(
   platform: SocialPlatform,
   username: string
-): SocialDemographicData {
+): DemographicData {
   // In a real implementation, we would call the appropriate social media API
   // For this prototype, we'll return different mock data based on username length as a simple differentiator
   

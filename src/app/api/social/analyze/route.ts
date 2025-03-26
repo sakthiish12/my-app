@@ -5,7 +5,7 @@ import connectToDatabase from '@/lib/db';
 import User from '@/models/User';
 import PricingData from '@/models/PricingData';
 import { auth } from '@clerk/nextjs/server';
-import { SocialAccount } from '@/types/social';
+import { SocialAccount, DemographicData } from '@/types/social';
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get demographic data (mock data in this prototype)
-    const demographicData = getMockFollowerData(platform, username);
+    const demographicData: DemographicData = getMockFollowerData(platform, username);
 
     // Add or update social account in user profile
     const existingAccountIndex = user.socialAccounts.findIndex(
