@@ -6,6 +6,7 @@ import connectToDatabase from '@/lib/db';
 import User from '@/models/User';
 import PricingData from '@/models/PricingData';
 import { UserButton } from '@clerk/nextjs';
+import { Types } from 'mongoose';
 
 export default async function Dashboard() {
   const { userId } = auth();
@@ -62,7 +63,14 @@ export default async function Dashboard() {
             <h2 className="text-lg font-semibold mb-4">Social Media Accounts</h2>
             {dbUser.socialAccounts && dbUser.socialAccounts.length > 0 ? (
               <ul className="space-y-2">
-                {dbUser.socialAccounts.map((account, index) => (
+                {dbUser.socialAccounts.map((account: {
+                  platform: string;
+                  username: string;
+                  accountId?: string;
+                  followers?: number;
+                  followersData?: any;
+                  lastUpdated?: Date;
+                }, index: number) => (
                   <li key={index} className="flex items-center justify-between">
                     <div>
                       <span className="font-medium capitalize">{account.platform}</span>
@@ -91,8 +99,8 @@ export default async function Dashboard() {
             <h2 className="text-lg font-semibold mb-4">Recent Analyses</h2>
             {pricingHistory.length > 0 ? (
               <ul className="space-y-3">
-                {pricingHistory.map((pricing) => (
-                  <li key={pricing._id.toString()} className="border-b pb-2">
+                {pricingHistory.map((pricing, index: number) => (
+                  <li key={index} className="border-b pb-2">
                     <div className="flex justify-between">
                       <span className="font-medium capitalize">{pricing.productType}</span>
                       <span className="text-green-600 font-medium">

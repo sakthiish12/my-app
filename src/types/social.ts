@@ -8,6 +8,8 @@ export interface DemographicData {
   totalFollowers: number;
   regions: Region[];
   engagementRate: number;
+  ageDistribution: Record<string, number>;
+  genderDistribution: Record<string, number>;
 }
 
 export interface SocialAccount {
