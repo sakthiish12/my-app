@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
+const isProd = process.env.NODE_ENV === 'production';
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable');
+// Only require MongoDB URI in production or if explicitly provided
+if (isProd && !MONGODB_URI) {
+  console.warn('MongoDB URI not defined. Some functionality will be limited.');
 }
 
 interface MongooseCache {
@@ -20,6 +22,12 @@ if (!global.mongoose) {
 }
 
 async function connectToDatabase() {
+  // Return early if no MongoDB URI is provided
+  if (!MONGODB_URI) {
+    console.warn('No MongoDB URI provided. Database operations will fail.');
+    return null;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }

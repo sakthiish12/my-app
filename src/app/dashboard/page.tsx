@@ -17,7 +17,42 @@ export default async function Dashboard() {
   }
 
   // Connect to the database
-  await connectToDatabase();
+  const dbConnection = await connectToDatabase();
+  
+  // If database connection failed, show a simplified dashboard
+  if (!dbConnection) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm">
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <Link href="/" className="text-2xl font-bold text-indigo-600">
+              PeakPrice
+            </Link>
+            <div className="flex items-center gap-4">
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold mb-2">Welcome, {user.firstName}!</h1>
+            <p className="text-gray-600">
+              The database connection is currently unavailable. Please check back later.
+            </p>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">Database Connection Error</h2>
+            <p className="text-gray-600 mb-4">
+              We're unable to connect to our database at the moment. This might be due to maintenance or 
+              configuration issues. Full functionality will be available once the database connection is restored.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
   
   // Find or create user in our database
   let dbUser = await User.findOne({ clerkId: userId });

@@ -27,8 +27,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get demographic data (mock data in this prototype)
+    const demographicData: DemographicData = getMockFollowerData(platform, username);
+
+    // Generate pricing recommendation
+    const pricingRecommendation = analyzeAndRecommendPrice(productType, {
+      totalFollowers: demographicData.totalFollowers,
+      regions: demographicData.regions,
+      engagementRate: demographicData.engagementRate,
+    });
+
     // Connect to database
-    await connectToDatabase();
+    const dbConnection = await connectToDatabase();
+    
+    // If database connection failed, return just the analysis without saving
+    if (!dbConnection) {
+      return NextResponse.json({
+        success: true,
+        message: 'Database unavailable. Analysis provided but not saved.',
+        data: {
+          demographicData,
+          pricingRecommendation,
+        },
+      });
+    }
 
     // Find or create user
     let user = await User.findOne({ clerkId: userId });
@@ -42,9 +64,6 @@ export async function POST(request: NextRequest) {
         socialAccounts: [],
       });
     }
-
-    // Get demographic data (mock data in this prototype)
-    const demographicData: DemographicData = getMockFollowerData(platform, username);
 
     // Add or update social account in user profile
     const existingAccountIndex = user.socialAccounts.findIndex(
@@ -66,13 +85,6 @@ export async function POST(request: NextRequest) {
     }
 
     await user.save();
-
-    // Generate pricing recommendation
-    const pricingRecommendation = analyzeAndRecommendPrice(productType, {
-      totalFollowers: demographicData.totalFollowers,
-      regions: demographicData.regions,
-      engagementRate: demographicData.engagementRate,
-    });
 
     // Save pricing recommendation
     await PricingData.findOneAndUpdate(

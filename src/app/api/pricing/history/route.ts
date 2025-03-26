@@ -16,7 +16,16 @@ export async function GET(request: NextRequest) {
     }
 
     // Connect to database
-    await connectToDatabase();
+    const dbConnection = await connectToDatabase();
+    
+    // If database connection failed, return empty data with a message
+    if (!dbConnection) {
+      return NextResponse.json({
+        success: false,
+        message: 'Database connection unavailable',
+        data: []
+      });
+    }
 
     // Find user
     const user = await User.findOne({ clerkId: userId });
