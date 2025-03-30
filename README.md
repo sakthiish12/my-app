@@ -1,4 +1,4 @@
-# SocioPrice
+un # SocioPrice
 
 AI-powered pricing intelligence for social media creators. SocioPrice analyzes your audience demographics and engagement metrics to provide personalized pricing recommendations that maximize your revenue.
 

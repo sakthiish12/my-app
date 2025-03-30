@@ -65,6 +65,12 @@ export default function Home() {
             >
               Join the Waitlist
             </button>
+            <Link 
+              href="/sign-in" 
+              className="px-6 py-2 border-2 border-indigo-600 text-indigo-600 rounded-full hover:bg-indigo-50 transition-all"
+            >
+              Login
+            </Link>
           </nav>
         </div>
       </header>

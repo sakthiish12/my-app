@@ -1,100 +1,288 @@
-type Region = {
-  name: string;
-  percentage: number;
-  purchasingPowerIndex: number;
-};
+import { ProductType, FollowerDemographics, Region } from '@/types/social';
 
-type FollowerDemographics = {
-  totalFollowers: number;
-  regions: Region[];
-  ageDistribution?: {
-    [key: string]: number;
-  };
-  genderDistribution?: {
-    [key: string]: number;
-  };
-  engagementRate?: number;
-};
-
-type ProductType = 
-  | 'course' 
-  | 'ebook' 
-  | 'template' 
-  | 'coaching' 
-  | 'planner' 
-  | 'subscription' 
-  | 'software' 
-  | 'digitalArt' 
-  | 'tutorial';
-
-// Base pricing matrix per product type (in USD)
-const baseProductPricing: Record<ProductType, { base: number, range: [number, number] }> = {
-  course: { base: 97, range: [47, 497] },
-  ebook: { base: 27, range: [9, 47] },
-  template: { base: 37, range: [17, 97] },
-  coaching: { base: 150, range: [50, 500] },
-  planner: { base: 17, range: [7, 37] },
-  subscription: { base: 15, range: [5, 50] },
-  software: { base: 49, range: [19, 199] },
-  digitalArt: { base: 25, range: [5, 100] },
-  tutorial: { base: 37, range: [17, 97] },
-};
-
-// Purchasing power index by region (simplified, normalized where US = 100)
-const regionPurchasingPower: Record<string, number> = {
-  'United States': 100,
-  'Canada': 85,
-  'United Kingdom': 80,
-  'European Union': 75,
-  'Australia': 85,
-  'Japan': 70,
-  'South Korea': 65,
-  'China': 40,
-  'India': 25,
-  'Brazil': 35,
-  'Mexico': 30,
-  'Singapore': 90,
-  'Southeast Asia': 30,
-  'Middle East': 70,
-  'Africa': 20,
-  'Russia': 40,
-  'Other': 50,
-};
-
-// Follower count multiplier - larger audiences often mean lower prices to maximize conversion
-const getFollowerCountMultiplier = (followerCount: number): number => {
-  if (followerCount < 1000) return 0.8; // Very small audience, might need to charge more
-  if (followerCount < 10000) return 0.9; // Small audience
-  if (followerCount < 50000) return 1.0; // Medium audience
-  if (followerCount < 100000) return 1.05; // Large audience, slight optimization for volume
-  if (followerCount < 500000) return 1.1; // Very large audience
-  return 1.15; // Mega influencer, optimize for volume
-};
-
-// Engagement rate multiplier - higher engagement means audience values your content more
-const getEngagementMultiplier = (engagementRate: number): number => {
-  if (engagementRate < 0.01) return 0.85; // Very low engagement
-  if (engagementRate < 0.03) return 0.95; // Below average engagement
-  if (engagementRate < 0.05) return 1.0; // Average engagement
-  if (engagementRate < 0.08) return 1.1; // Good engagement
-  if (engagementRate < 0.12) return 1.2; // Very good engagement
-  return 1.3; // Exceptional engagement
-};
-
-// Calculate weighted purchasing power based on follower demographics
-const calculateWeightedPurchasingPower = (regions: Region[]): number => {
-  let weightedPurchasingPower = 0;
-  
-  for (const region of regions) {
-    const purchasingPower = region.purchasingPowerIndex || 
-                           regionPurchasingPower[region.name] || 
-                           regionPurchasingPower['Other'];
-    
-    weightedPurchasingPower += (purchasingPower * (region.percentage / 100));
+// Industry average prices based on market research (in USD)
+const industryAveragePricing: Record<ProductType, {
+  entry: number;
+  standard: number;
+  premium: number;
+  marketData: {
+    avgCompletionRate: number;
+    avgRefundRate: number;
+    avgSatisfactionScore: number;
   }
+}> = {
+  course: {
+    entry: 97,
+    standard: 297,
+    premium: 997,
+    marketData: {
+      avgCompletionRate: 0.35,
+      avgRefundRate: 0.08,
+      avgSatisfactionScore: 4.2
+    }
+  },
+  ebook: {
+    entry: 17,
+    standard: 37,
+    premium: 67,
+    marketData: {
+      avgCompletionRate: 0.45,
+      avgRefundRate: 0.05,
+      avgSatisfactionScore: 4.0
+    }
+  },
+  template: {
+    entry: 27,
+    standard: 67,
+    premium: 147,
+    marketData: {
+      avgCompletionRate: 0.80,
+      avgRefundRate: 0.03,
+      avgSatisfactionScore: 4.4
+    }
+  },
+  coaching: {
+    entry: 97,
+    standard: 297,
+    premium: 997,
+    marketData: {
+      avgCompletionRate: 0.75,
+      avgRefundRate: 0.04,
+      avgSatisfactionScore: 4.6
+    }
+  },
+  planner: {
+    entry: 17,
+    standard: 37,
+    premium: 97,
+    marketData: {
+      avgCompletionRate: 0.60,
+      avgRefundRate: 0.06,
+      avgSatisfactionScore: 4.1
+    }
+  },
+  subscription: {
+    entry: 9,
+    standard: 29,
+    premium: 99,
+    marketData: {
+      avgCompletionRate: 0.70,
+      avgRefundRate: 0.12,
+      avgSatisfactionScore: 4.0
+    }
+  },
+  software: {
+    entry: 29,
+    standard: 79,
+    premium: 199,
+    marketData: {
+      avgCompletionRate: 0.65,
+      avgRefundRate: 0.07,
+      avgSatisfactionScore: 4.3
+    }
+  },
+  digitalArt: {
+    entry: 15,
+    standard: 47,
+    premium: 147,
+    marketData: {
+      avgCompletionRate: 0.90,
+      avgRefundRate: 0.04,
+      avgSatisfactionScore: 4.5
+    }
+  },
+  tutorial: {
+    entry: 27,
+    standard: 67,
+    premium: 147,
+    marketData: {
+      avgCompletionRate: 0.55,
+      avgRefundRate: 0.06,
+      avgSatisfactionScore: 4.2
+    }
+  }
+};
+
+// Regional economic data (normalized to US = 100)
+const regionalEconomicData: Record<string, {
+  purchasingPowerIndex: number;
+  ecommercePenetration: number;
+  digitalProductAdoption: number;
+  averageDisposableIncome: number;
+  currencyStrength: number;
+}> = {
+  'United States': {
+    purchasingPowerIndex: 100,
+    ecommercePenetration: 0.85,
+    digitalProductAdoption: 0.80,
+    averageDisposableIncome: 45000,
+    currencyStrength: 1.00
+  },
+  'Canada': {
+    purchasingPowerIndex: 85,
+    ecommercePenetration: 0.83,
+    digitalProductAdoption: 0.78,
+    averageDisposableIncome: 38000,
+    currencyStrength: 0.75
+  },
+  'United Kingdom': {
+    purchasingPowerIndex: 80,
+    ecommercePenetration: 0.87,
+    digitalProductAdoption: 0.82,
+    averageDisposableIncome: 35000,
+    currencyStrength: 0.78
+  },
+  'European Union': {
+    purchasingPowerIndex: 75,
+    ecommercePenetration: 0.80,
+    digitalProductAdoption: 0.75,
+    averageDisposableIncome: 32000,
+    currencyStrength: 0.85
+  },
+  'Australia': {
+    purchasingPowerIndex: 85,
+    ecommercePenetration: 0.82,
+    digitalProductAdoption: 0.77,
+    averageDisposableIncome: 37000,
+    currencyStrength: 0.70
+  },
+  'Japan': {
+    purchasingPowerIndex: 70,
+    ecommercePenetration: 0.89,
+    digitalProductAdoption: 0.85,
+    averageDisposableIncome: 30000,
+    currencyStrength: 0.90
+  },
+  'South Korea': {
+    purchasingPowerIndex: 65,
+    ecommercePenetration: 0.90,
+    digitalProductAdoption: 0.88,
+    averageDisposableIncome: 28000,
+    currencyStrength: 0.85
+  },
+  'China': {
+    purchasingPowerIndex: 40,
+    ecommercePenetration: 0.85,
+    digitalProductAdoption: 0.80,
+    averageDisposableIncome: 15000,
+    currencyStrength: 0.15
+  },
+  'India': {
+    purchasingPowerIndex: 25,
+    ecommercePenetration: 0.70,
+    digitalProductAdoption: 0.65,
+    averageDisposableIncome: 8000,
+    currencyStrength: 0.012
+  },
+  'Brazil': {
+    purchasingPowerIndex: 35,
+    ecommercePenetration: 0.65,
+    digitalProductAdoption: 0.60,
+    averageDisposableIncome: 12000,
+    currencyStrength: 0.20
+  },
+  'Other': {
+    purchasingPowerIndex: 50,
+    ecommercePenetration: 0.70,
+    digitalProductAdoption: 0.65,
+    averageDisposableIncome: 20000,
+    currencyStrength: 0.50
+  }
+};
+
+// Engagement metrics impact on pricing
+const getEngagementMultiplier = (
+  engagementRate: number,
+  followerCount: number
+): number => {
+  // Base multiplier from engagement rate
+  let multiplier = 1.0;
   
-  // Normalize to a value around 1.0
-  return weightedPurchasingPower / 100;
+  // Engagement rate impact
+  if (engagementRate < 0.01) multiplier *= 0.85;
+  else if (engagementRate < 0.03) multiplier *= 0.95;
+  else if (engagementRate < 0.05) multiplier *= 1.0;
+  else if (engagementRate < 0.08) multiplier *= 1.1;
+  else if (engagementRate < 0.12) multiplier *= 1.2;
+  else multiplier *= 1.3;
+
+  // Adjust based on follower count (larger audiences typically have lower engagement)
+  const normalizedEngagement = engagementRate * Math.log10(followerCount);
+  if (normalizedEngagement > 0.5) multiplier *= 1.15;
+  
+  return multiplier;
+};
+
+// Calculate market position based on audience quality
+const calculateMarketPosition = (
+  demographics: FollowerDemographics,
+  productType: ProductType
+): 'entry' | 'standard' | 'premium' => {
+  const {
+    totalFollowers,
+    engagementRate,
+    regions
+  } = demographics;
+
+  // Calculate audience quality score (0-100)
+  let qualityScore = 0;
+
+  // Engagement contribution (0-40 points)
+  qualityScore += (engagementRate * 1000) * 40;
+
+  // Follower count contribution (0-30 points)
+  const followerScore = Math.min(Math.log10(totalFollowers) * 10, 30);
+  qualityScore += followerScore;
+
+  // Regional quality contribution (0-30 points)
+  const weightedRegionalScore = regions.reduce((score, region) => {
+    const regionData = regionalEconomicData[region.name] || regionalEconomicData['Other'];
+    return score + (
+      (regionData.purchasingPowerIndex / 100) * 
+      regionData.digitalProductAdoption * 
+      (region.percentage / 100) * 
+      30
+    );
+  }, 0);
+  qualityScore += weightedRegionalScore;
+
+  // Determine market position based on quality score
+  if (qualityScore >= 75) return 'premium';
+  if (qualityScore >= 45) return 'standard';
+  return 'entry';
+};
+
+// Calculate weighted purchasing power and market factors
+const calculateMarketFactors = (
+  regions: Region[],
+  productType: ProductType
+): number => {
+  let marketMultiplier = 0;
+  const totalWeight = regions.reduce((sum, region) => sum + region.percentage, 0);
+
+  for (const region of regions) {
+    const normalizedWeight = region.percentage / totalWeight;
+    const regionData = regionalEconomicData[region.name] || regionalEconomicData['Other'];
+    
+    const regionMultiplier = (
+      (regionData.purchasingPowerIndex / 100) *
+      regionData.ecommercePenetration *
+      regionData.digitalProductAdoption *
+      (regionData.averageDisposableIncome / regionalEconomicData['United States'].averageDisposableIncome)
+    );
+
+    marketMultiplier += regionMultiplier * normalizedWeight;
+  }
+
+  // Adjust for product type market conditions
+  const productMarketData = industryAveragePricing[productType].marketData;
+  marketMultiplier *= (
+    (1 + productMarketData.avgSatisfactionScore / 5) *
+    (1 - productMarketData.avgRefundRate) *
+    (1 + productMarketData.avgCompletionRate)
+  );
+
+  return marketMultiplier;
 };
 
 export function analyzeAndRecommendPrice(
@@ -104,53 +292,74 @@ export function analyzeAndRecommendPrice(
   recommendedPrice: number;
   priceRange: { min: number; max: number };
   conversionRatePrediction: number;
+  marketPosition: 'entry' | 'standard' | 'premium';
+  confidenceScore: number;
 } {
-  // Get the base pricing for this product type
-  const { base, range } = baseProductPricing[productType];
+  // Determine market position
+  const marketPosition = calculateMarketPosition(demographics, productType);
   
-  // Calculate weighted purchasing power multiplier based on regions
-  const purchasingPowerMultiplier = calculateWeightedPurchasingPower(demographics.regions);
+  // Get base price for the determined market position
+  const basePrice = industryAveragePricing[productType][marketPosition];
   
-  // Calculate follower count multiplier
-  const followerMultiplier = getFollowerCountMultiplier(demographics.totalFollowers);
+  // Calculate engagement multiplier
+  const engagementMultiplier = getEngagementMultiplier(
+    demographics.engagementRate,
+    demographics.totalFollowers
+  );
   
-  // Calculate engagement multiplier (default to 1.0 if not provided)
-  const engagementMultiplier = demographics.engagementRate 
-    ? getEngagementMultiplier(demographics.engagementRate)
-    : 1.0;
+  // Calculate market factors
+  const marketFactors = calculateMarketFactors(demographics.regions, productType);
   
-  // Calculate the recommended price
-  let recommendedPrice = base * purchasingPowerMultiplier * followerMultiplier * engagementMultiplier;
+  // Calculate recommended price
+  let recommendedPrice = basePrice * engagementMultiplier * marketFactors;
   
-  // Round to nearest .99 or .97 price point
-  recommendedPrice = Math.round(recommendedPrice);
-  if (recommendedPrice > 10) {
-    recommendedPrice = recommendedPrice - (recommendedPrice % 10) + 7;
+  // Round to appropriate price point
+  if (recommendedPrice > 100) {
+    recommendedPrice = Math.round(recommendedPrice / 10) * 10 - 3;
   } else {
-    recommendedPrice = recommendedPrice - 0.01;
+    recommendedPrice = Math.round(recommendedPrice) - 1;
   }
   
-  // Calculate a reasonable price range
-  const minPrice = Math.max(range[0], Math.floor(recommendedPrice * 0.7));
-  const maxPrice = Math.min(range[1], Math.ceil(recommendedPrice * 1.5));
+  // Calculate price range
+  const priceRange = {
+    min: Math.max(
+      industryAveragePricing[productType].entry,
+      Math.floor(recommendedPrice * 0.8)
+    ),
+    max: Math.min(
+      industryAveragePricing[productType].premium,
+      Math.ceil(recommendedPrice * 1.3)
+    )
+  };
   
-  // Estimate conversion rate (simplified model)
-  // Higher prices typically result in lower conversion rates
-  const basePriceRatio = recommendedPrice / base;
-  let conversionRatePrediction = 0.05; // Default 5% conversion
+  // Predict conversion rate
+  const marketData = industryAveragePricing[productType].marketData;
+  let conversionRatePrediction = 0.05; // Base conversion rate
   
-  if (basePriceRatio < 0.7) {
-    conversionRatePrediction = 0.08; // 8% when priced lower than standard
-  } else if (basePriceRatio > 1.3) {
-    conversionRatePrediction = 0.03; // 3% when priced higher than standard
-  }
+  // Adjust conversion rate based on price position
+  const pricePositionFactor = recommendedPrice / basePrice;
+  if (pricePositionFactor < 0.8) conversionRatePrediction *= 1.2;
+  else if (pricePositionFactor > 1.2) conversionRatePrediction *= 0.8;
   
-  // Adjust by engagement (engaged followers more likely to convert)
-  conversionRatePrediction *= engagementMultiplier;
+  // Adjust for market factors
+  conversionRatePrediction *= (
+    (1 - marketData.avgRefundRate) *
+    marketData.avgCompletionRate *
+    (marketData.avgSatisfactionScore / 5)
+  );
   
+  // Calculate confidence score (0-100)
+  const confidenceScore = Math.min(Math.round(
+    (engagementMultiplier * 30) +
+    (marketFactors * 40) +
+    ((1 - Math.abs(1 - pricePositionFactor)) * 30)
+  ), 100);
+
   return {
     recommendedPrice,
-    priceRange: { min: minPrice, max: maxPrice },
+    priceRange,
     conversionRatePrediction,
+    marketPosition,
+    confidenceScore
   };
 } 

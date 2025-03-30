@@ -5,7 +5,7 @@ import Link from 'next/link';
 import connectToDatabase from '@/lib/db';
 import User from '@/models/User';
 import PricingData from '@/models/PricingData';
-import { Types } from 'mongoose';
+import SocialAccountsSection from '@/components/SocialAccountsSection';
 
 export default async function Dashboard() {
   const { userId } = auth();
@@ -41,7 +41,7 @@ export default async function Dashboard() {
   }
   
   // Find or create user in our database
-  let dbUser = await User.findOne({ clerkId: userId });
+  let dbUser = await User.findOne({ clerkId: userId }).lean();
   
   if (!dbUser) {
     dbUser = await User.create({
@@ -68,54 +68,22 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {/* Temporarily removed until subscription is implemented */}
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Social Media Accounts</h2>
-          {dbUser.socialAccounts && dbUser.socialAccounts.length > 0 ? (
-            <ul className="space-y-2">
-              {dbUser.socialAccounts.map((account: {
-                platform: string;
-                username: string;
-                accountId?: string;
-                followers?: number;
-                followersData?: any;
-                lastUpdated?: Date;
-              }, index: number) => (
-                <li key={index} className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-gray-900 capitalize">{account.platform}</span>
-                    <span className="text-gray-700 ml-2">@{account.username}</span>
-                  </div>
-                  <span className="text-sm text-gray-700">
-                    {account.followers?.toLocaleString()} followers
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-800">No social accounts connected yet.</p>
-          )}
-          <div className="mt-4 space-y-2">
-            <Link
-              href="/dashboard/linkedin"
-              className="text-purple-700 hover:text-purple-900 text-sm font-medium block"
-            >
-              + Add LinkedIn Account
-            </Link>
-            <Link
-              href="/dashboard/instagram"
-              className="text-purple-700 hover:text-purple-900 text-sm font-medium block"
-            >
-              + Add Instagram Account
-            </Link>
-            <Link
-              href="/dashboard/tiktok"
-              className="text-purple-700 hover:text-purple-900 text-sm font-medium block"
-            >
-              + Add TikTok Account
-            </Link>
-          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Analysis</h2>
+          <p className="text-gray-800 mb-4">
+            Analyze your social media audience and get pricing recommendations instantly.
+          </p>
+          <Link
+            href="/dashboard/analyze"
+            className="inline-block w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors"
+          >
+            Start New Analysis
+          </Link>
         </div>
-
+        
+        <SocialAccountsSection accounts={dbUser.socialAccounts || []} />
+        
         <div className="bg-white p-6 rounded-lg shadow-sm">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Analyses</h2>
           {pricingHistory.length > 0 ? (
@@ -148,19 +116,6 @@ export default async function Dashboard() {
               View All Analyses
             </Link>
           </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Analysis</h2>
-          <p className="text-gray-800 mb-4">
-            Analyze your social media audience and get pricing recommendations instantly.
-          </p>
-          <Link
-            href="/dashboard/analyze"
-            className="inline-block w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors"
-          >
-            Start New Analysis
-          </Link>
         </div>
       </div>
 

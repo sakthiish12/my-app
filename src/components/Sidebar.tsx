@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LuLayoutDashboard, LuLinkedin, LuInstagram } from 'react-icons/lu';
+import { LuLayoutDashboard, LuLinkedin, LuInstagram, LuCreditCard } from 'react-icons/lu';
 import { FaTiktok } from 'react-icons/fa';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LuLayoutDashboard },
+  { name: 'Pricing', href: '/pricing', icon: LuCreditCard },
   { name: 'LinkedIn', href: '/dashboard/linkedin', icon: LuLinkedin },
   { name: 'Instagram', href: '/dashboard/instagram', icon: LuInstagram },
   { name: 'TikTok', href: '/dashboard/tiktok', icon: FaTiktok },
@@ -19,7 +20,7 @@ export default function Sidebar() {
     <div className="h-full w-64 bg-white border-r shadow-sm">
       <div className="p-4">
         <Link href="/" className="text-2xl font-bold text-indigo-600">
-          PeakPrice
+          SocioPrice
         </Link>
       </div>
       <nav className="mt-6">
