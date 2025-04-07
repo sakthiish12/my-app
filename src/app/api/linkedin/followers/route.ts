@@ -43,18 +43,16 @@ export async function POST(req: Request) {
       });
     }
     
-    // Get PhantomBuster API key
-    const pbIntegration = await db.collection("integrations").findOne({
-      userId,
-      platform: "phantombuster"
-    });
+    // Use admin PhantomBuster API key from environment variables
+    const adminPhantomBusterApiKey = process.env.ADMIN_PHANTOMBUSTER_API_KEY;
     
-    if (!pbIntegration || !pbIntegration.apiKey) {
+    if (!adminPhantomBusterApiKey) {
+      console.error('Admin PhantomBuster API key not configured in environment variables');
       await client.close();
       return new NextResponse(JSON.stringify({
         status: "error",
-        message: "PhantomBuster API key not found. Please set up PhantomBuster integration first."
-      }), { status: 400 });
+        message: "Server configuration error. Please contact support."
+      }), { status: 500 });
     }
     
     // Check for LinkedIn OAuth tokens
@@ -94,8 +92,8 @@ export async function POST(req: Request) {
       }
     }
     
-    // Initialize LinkedIn service with PhantomBuster API key
-    const linkedInService = new LinkedInService(pbIntegration.apiKey);
+    // Initialize LinkedIn service with admin PhantomBuster API key
+    const linkedInService = new LinkedInService(adminPhantomBusterApiKey);
     
     // Store the LinkedIn profile URL with the user for consistency
     await db.collection("user_profiles").updateOne(
@@ -107,8 +105,11 @@ export async function POST(req: Request) {
     // Set the session cookie in environment for this request
     process.env.LINKEDIN_SESSION_COOKIE = sessionCookie;
     
-    // Fetch and process LinkedIn followers
-    const followerCount = await linkedInService.fetchAndSaveFollowers(userId, linkedinProfileUrl);
+    // Use a standard phantom ID or create one based on the user's ID
+    const phantomId = process.env.ADMIN_PHANTOMBUSTER_PHANTOM_ID || `user_${userId.slice(-8)}`;
+    
+    // Fetch and process LinkedIn followers with the phantom ID
+    const followerCount = await linkedInService.fetchAndSaveFollowers(userId, linkedinProfileUrl, phantomId);
     
     await client.close();
     

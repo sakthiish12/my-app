@@ -4,14 +4,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FaLinkedin, FaUserFriends, FaChartBar, FaMoneyBillWave, FaShoppingCart, FaQuestionCircle, FaSignInAlt } from 'react-icons/fa';
-import PhantomBusterSetup from '@/components/PhantomBusterSetup';
 import LinkedInLoginButton from '@/components/LinkedInLoginButton';
-
-interface PhantomBusterFormData {
-  apiKey: string;
-  phantomId?: string;
-  terms: boolean;
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LinkedInFormData {
   linkedinProfileUrl: string;
@@ -48,8 +42,6 @@ interface AnalyticsData {
 export default function LinkedInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [phantomSubmitting, setPhantomSubmitting] = useState(false);
-  const [phantomSuccess, setPhantomSuccess] = useState(false);
   const [linkedinSubmitting, setLinkedinSubmitting] = useState(false);
   const [linkedinSuccess, setLinkedinSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,13 +49,6 @@ export default function LinkedInPage() {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [activeTab, setActiveTab] = useState<'demographics' | 'pricing' | 'products'>('demographics');
-  const [showSetupGuide, setShowSetupGuide] = useState(false);
-  
-  const { 
-    register: registerPhantom, 
-    handleSubmit: handlePhantomSubmit, 
-    formState: { errors: phantomErrors } 
-  } = useForm<PhantomBusterFormData>();
   
   const { 
     register: registerLinkedin, 
@@ -170,6 +155,19 @@ export default function LinkedInPage() {
     }
   }, [searchParams]);
 
+  // Add a function to get the user's name from Clerk for use as default Phantom ID
+  const { user } = useAuth();
+  const [defaultPhantomId, setDefaultPhantomId] = useState<string>('');
+  
+  useEffect(() => {
+    // Set default Phantom ID based on user's name if available
+    if (user?.firstName) {
+      // Create a simplified version of user's name for the Phantom ID
+      const simplifiedName = user.firstName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      setDefaultPhantomId(simplifiedName);
+    }
+  }, [user]);
+
   // Load analytics data when component mounts
   useEffect(() => {
     fetchAnalytics();
@@ -183,8 +181,6 @@ export default function LinkedInPage() {
       
       if (response.ok && result.status === 'success') {
         setAnalytics(result.data);
-      } else if (response.status === 400 && result.message.includes('PhantomBuster')) {
-        // PhantomBuster not set up yet, that's fine
       } else if (response.status === 401 && result.code === 'linkedin_auth_required') {
         // LinkedIn auth required, not an error
         console.log('LinkedIn authentication required');
@@ -198,39 +194,6 @@ export default function LinkedInPage() {
       console.error("Error fetching LinkedIn analytics:", error);
     } finally {
       setAnalyticsLoading(false);
-    }
-  };
-
-  const onPhantomSubmit = async (data: PhantomBusterFormData) => {
-    setPhantomSubmitting(true);
-    setError(null);
-    
-    try {
-      const response = await fetch('/api/integrations/phantombuster', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          apiKey: data.apiKey,
-          phantomId: data.phantomId,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to connect PhantomBuster account');
-      }
-
-      setPhantomSuccess(true);
-      
-    } catch (error) {
-      console.error("Error saving PhantomBuster API key:", error);
-      setError(error instanceof Error ? error.message : 'Failed to connect PhantomBuster account');
-      setPhantomSuccess(false);
-    } finally {
-      setPhantomSubmitting(false);
     }
   };
 
@@ -357,166 +320,60 @@ export default function LinkedInPage() {
         </p>
       </div>
 
-      {/* PhantomBuster Integration Section */}
+      {/* LinkedIn Profile URL Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
         <div className="flex items-center mb-4">
-          <FaChartBar className="text-2xl text-blue-600 mr-3" />
-          <h2 className="text-xl font-bold text-gray-900">Connect PhantomBuster</h2>
-          <button 
-            onClick={() => setShowSetupGuide(true)}
-            className="ml-2 text-blue-600 hover:text-blue-800"
-            title="Learn how to set up PhantomBuster"
-          >
-            <FaQuestionCircle />
-          </button>
+          <FaUserFriends className="text-2xl text-blue-600 mr-3" />
+          <h2 className="text-xl font-bold text-gray-900">Analyze Your LinkedIn Followers</h2>
         </div>
         
-        <p className="text-gray-800 mb-4">
-          PhantomBuster helps extract LinkedIn follower data. You'll need a PhantomBuster account and API key.
-        </p>
-        
-        {showSetupGuide && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              <PhantomBusterSetup onClose={() => setShowSetupGuide(false)} />
-            </div>
-          </div>
-        )}
-        
-        {phantomSuccess ? (
+        {linkedinSuccess ? (
           <div className="space-y-4">
             <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
-              <p className="font-medium">PhantomBuster successfully connected!</p>
-              <p className="text-sm mt-1">You can now proceed to analyze your LinkedIn followers.</p>
+              <p className="font-medium">LinkedIn followers successfully analyzed!</p>
+              <p className="text-sm mt-1">You can now view your audience insights below.</p>
             </div>
             <button
-              onClick={() => setPhantomSuccess(false)}
+              onClick={() => setLinkedinSuccess(false)}
               className="text-blue-600 hover:text-blue-900 font-medium"
             >
-              Update PhantomBuster Credentials
+              Analyze Another Profile
             </button>
           </div>
         ) : (
-          <form onSubmit={handlePhantomSubmit(onPhantomSubmit)} className="space-y-4">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4">
-                {error}
-              </div>
-            )}
-            
+          <form onSubmit={handleLinkedinSubmit(onLinkedinSubmit)} className="space-y-4">
             <div>
-              <label htmlFor="apiKey" className="block text-sm font-medium text-gray-900 mb-1">
-                PhantomBuster API Key
+              <label htmlFor="linkedinProfileUrl" className="block text-sm font-medium text-gray-900 mb-1">
+                LinkedIn Profile URL
               </label>
               <input
-                id="apiKey"
-                type="password"
-                {...registerPhantom("apiKey", { required: "API Key is required" })}
+                id="linkedinProfileUrl"
+                type="text"
+                {...registerLinkedin("linkedinProfileUrl", { required: "LinkedIn profile URL is required" })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                placeholder="Enter your PhantomBuster API Key"
+                placeholder="https://www.linkedin.com/in/yourprofile/"
               />
-              {phantomErrors.apiKey && (
-                <p className="mt-1 text-sm text-red-600">{phantomErrors.apiKey.message}</p>
+              {linkedinErrors.linkedinProfileUrl && (
+                <p className="mt-1 text-sm text-red-600">{linkedinErrors.linkedinProfileUrl.message}</p>
               )}
             </div>
             
-            <div>
-              <label htmlFor="phantomId" className="block text-sm font-medium text-gray-900 mb-1">
-                Phantom ID (Optional)
-              </label>
-              <input
-                id="phantomId"
-                type="text"
-                {...registerPhantom("phantomId")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                placeholder="Enter your LinkedIn Followers Extractor Phantom ID"
-              />
-            </div>
-            
-            <div className="flex items-center">
-              <input
-                id="phantom-terms"
-                type="checkbox"
-                {...registerPhantom("terms", { required: "You must agree to the terms" })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="phantom-terms" className="ml-2 block text-sm text-gray-800">
-                I understand that my PhantomBuster API key will be stored securely and only used for the purposes of analyzing my LinkedIn audience.
-              </label>
-            </div>
-            {phantomErrors.terms && (
-              <p className="mt-1 text-sm text-red-600">{phantomErrors.terms.message}</p>
-            )}
-            
             <button
               type="submit"
-              disabled={phantomSubmitting}
+              disabled={linkedinSubmitting}
               className={`py-2 px-4 ${
-                phantomSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                linkedinSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
               } text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-colors`}
             >
-              {phantomSubmitting ? 'Connecting...' : 'Connect PhantomBuster'}
+              {linkedinSubmitting ? 'Analyzing...' : 'Analyze Followers'}
             </button>
+            
+            <p className="text-sm text-gray-700">
+              Note: This process may take several minutes depending on the number of followers.
+            </p>
           </form>
         )}
       </div>
-
-      {/* LinkedIn Profile URL Section */}
-      {phantomSuccess && (
-        <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-          <div className="flex items-center mb-4">
-            <FaUserFriends className="text-2xl text-blue-600 mr-3" />
-            <h2 className="text-xl font-bold text-gray-900">Step 2: Analyze Your LinkedIn Followers</h2>
-          </div>
-          
-          {linkedinSuccess ? (
-            <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded">
-                <p className="font-medium">LinkedIn followers successfully analyzed!</p>
-                <p className="text-sm mt-1">You can now view your audience insights below.</p>
-              </div>
-              <button
-                onClick={() => setLinkedinSuccess(false)}
-                className="text-blue-600 hover:text-blue-900 font-medium"
-              >
-                Analyze Another Profile
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleLinkedinSubmit(onLinkedinSubmit)} className="space-y-4">
-              <div>
-                <label htmlFor="linkedinProfileUrl" className="block text-sm font-medium text-gray-900 mb-1">
-                  LinkedIn Profile URL
-                </label>
-                <input
-                  id="linkedinProfileUrl"
-                  type="text"
-                  {...registerLinkedin("linkedinProfileUrl", { required: "LinkedIn profile URL is required" })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                  placeholder="https://www.linkedin.com/in/yourprofile/"
-                />
-                {linkedinErrors.linkedinProfileUrl && (
-                  <p className="mt-1 text-sm text-red-600">{linkedinErrors.linkedinProfileUrl.message}</p>
-                )}
-              </div>
-              
-              <button
-                type="submit"
-                disabled={linkedinSubmitting}
-                className={`py-2 px-4 ${
-                  linkedinSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-                } text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-colors`}
-              >
-                {linkedinSubmitting ? 'Analyzing...' : 'Analyze Followers'}
-              </button>
-              
-              <p className="text-sm text-gray-700">
-                Note: This process may take several minutes depending on the number of followers.
-              </p>
-            </form>
-          )}
-        </div>
-      )}
 
       {/* Analytics Dashboard */}
       {analytics && (

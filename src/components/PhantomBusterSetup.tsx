@@ -156,6 +156,7 @@ export default function PhantomBusterSetup({ onClose }: PhantomBusterSetupProps)
             <FaLightbulb className="text-blue-600 mt-1 mr-3 flex-shrink-0" />
             <p className="text-sm text-blue-800">
               The Phantom ID is visible in the URL when you're viewing the Phantom. It's a string of characters like "aBc7d6E9fG".
+              You can also simply use your name or username as the Phantom ID to make it easier to identify.
             </p>
           </div>
           

@@ -89,13 +89,13 @@ export class LinkedInService {
   /**
    * Fetch LinkedIn followers and save to database
    */
-  async fetchAndSaveFollowers(userId: string, linkedinProfileUrl: string): Promise<number> {
+  async fetchAndSaveFollowers(userId: string, linkedinProfileUrl: string, phantomId?: string): Promise<number> {
     try {
       // Ensure MongoDB connection
       await mongoose.connect(process.env.MONGODB_URI as string);
       
       // Fetch followers from PhantomBuster
-      const followers = await this.phantomBuster.fetchLinkedInFollowers(linkedinProfileUrl);
+      const followers = await this.phantomBuster.fetchLinkedInFollowers(linkedinProfileUrl, phantomId);
       
       // Process and enrich follower data
       const enrichedFollowers = this.enrichFollowerData(followers);

@@ -76,10 +76,10 @@ export class PhantomBusterService {
   /**
    * Fetch LinkedIn followers data using LinkedIn Followers Extractor phantom
    */
-  async fetchLinkedInFollowers(linkedinProfileUrl: string): Promise<LinkedInFollowerData[]> {
+  async fetchLinkedInFollowers(linkedinProfileUrl: string, customPhantomId?: string): Promise<LinkedInFollowerData[]> {
     try {
-      // Use configured API key to launch PhantomBuster
-      const phantomId = 'linkedin-followers-extractor';
+      // Use provided phantomId or default to the standard one
+      const phantomId = customPhantomId || 'linkedin-followers-extractor';
       
       // Get LinkedIn session cookie from environment
       const sessionCookie = process.env.LINKEDIN_SESSION_COOKIE;
@@ -94,6 +94,7 @@ export class PhantomBusterService {
         numberOfFollowersToScrape: 1000
       };
       
+      console.log(`Launching PhantomBuster with phantomId: ${phantomId}`);
       const launchResult = await this.launchPhantom(phantomId, params);
       
       // Wait for phantom to complete
