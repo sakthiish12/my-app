@@ -11,6 +11,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { code, redirectUri } = body;
     
+    console.log('Received code exchange request:', {
+      hasCode: !!code,
+      redirectUri,
+      hasUserId: !!userId
+    });
+    
     if (!code) {
       return NextResponse.json({ 
         status: 'error', 
@@ -22,7 +28,12 @@ export async function POST(request: Request) {
     try {
       // Pass the redirect URI that was used in the authorization request
       const tokens = await LinkedInAuthService.getAccessToken(code, redirectUri);
-      console.log('Successfully obtained LinkedIn tokens');
+      console.log('Successfully obtained LinkedIn tokens:', {
+        hasAccessToken: !!tokens.accessToken,
+        hasRefreshToken: !!tokens.refreshToken,
+        hasIdToken: !!tokens.idToken,
+        expiresAt: tokens.expiresAt
+      });
       
       // Save tokens to database if user is authenticated
       if (userId) {
@@ -40,7 +51,10 @@ export async function POST(request: Request) {
       // Try to get profile info (optional)
       try {
         const profile = await LinkedInAuthService.getProfile(tokens.accessToken);
-        console.log('LinkedIn profile retrieved:', profile.id);
+        console.log('LinkedIn profile retrieved:', {
+          id: profile.id,
+          hasName: !!profile.localizedFirstName
+        });
       } catch (profileError) {
         console.error('Error fetching LinkedIn profile:', profileError);
         // Continue anyway, this is not critical
@@ -49,13 +63,18 @@ export async function POST(request: Request) {
       // Return success response
       return NextResponse.json({
         status: 'success',
-        message: 'Successfully authenticated with LinkedIn'
+        message: 'Successfully authenticated with LinkedIn',
+        data: {
+          accessToken: tokens.accessToken.substring(0, 10) + '...',
+          idToken: tokens.idToken ? (tokens.idToken.substring(0, 10) + '...') : null
+        }
       });
     } catch (tokenError) {
       console.error('Error exchanging code for token:', tokenError);
       return NextResponse.json({ 
         status: 'error', 
-        error: 'Failed to exchange authorization code for access token' 
+        error: 'Failed to exchange authorization code for access token',
+        details: tokenError instanceof Error ? tokenError.message : String(tokenError)
       }, { status: 500 });
     }
     
@@ -63,7 +82,8 @@ export async function POST(request: Request) {
     console.error('LinkedIn token exchange error:', error);
     return NextResponse.json({ 
       status: 'error', 
-      error: 'An unexpected error occurred during authentication' 
+      error: 'An unexpected error occurred during authentication',
+      details: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 } 

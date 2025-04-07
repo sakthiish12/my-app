@@ -6,6 +6,7 @@ interface LinkedInTokens {
   accessToken: string;
   refreshToken?: string;
   expiresAt?: number;
+  idToken?: string;
 }
 
 class LinkedInAuthService {
@@ -61,21 +62,35 @@ class LinkedInAuthService {
       params.append('client_id', this.clientId);
       params.append('client_secret', this.clientSecret);
       
+      console.log('Exchanging code for token with params:', {
+        redirectUri: finalRedirectUri,
+        clientId: this.clientId,
+        clientSecret: this.clientSecret ? '[SECRET HIDDEN]' : 'missing'
+      });
+      
       const response = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       });
       
-      const expiresAt = Date.now() + response.data.expires_in * 1000;
+      console.log('Token response status:', response.status);
+      
+      // For OpenID Connect, the response includes id_token as well
+      const expiresAt = Date.now() + (response.data.expires_in || 3600) * 1000;
       
       return {
         accessToken: response.data.access_token,
         refreshToken: response.data.refresh_token,
+        idToken: response.data.id_token, // OpenID Connect token
         expiresAt
       };
     } catch (error) {
       console.error('Error exchanging LinkedIn auth code for token:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
       throw error;
     }
   }
@@ -247,19 +262,32 @@ class LinkedInAuthService {
    * For development testing, we'll use a placeholder approach
    */
   async getSessionCookieFromToken(accessToken: string): Promise<string> {
+    // First check if we have a session cookie directly in environment
     if (process.env.LINKEDIN_SESSION_COOKIE) {
-      // Use the environment variable if available as a fallback
       return process.env.LINKEDIN_SESSION_COOKIE;
     }
     
-    console.warn("Using development placeholder for LinkedIn cookie extraction.");
+    // If we have a specific admin access token, use it
+    if (process.env.LINKEDIN_ACCESS_TOKEN) {
+      console.log('Using admin access token for LinkedIn authentication');
+      return this.convertTokenToCookie(process.env.LINKEDIN_ACCESS_TOKEN);
+    }
     
-    // In a production environment, you would implement a service to:
-    // 1. Use a headless browser like Puppeteer to login to LinkedIn with the token
-    // 2. Extract and return the actual session cookies
+    // Otherwise use the provided token
+    console.log('Using provided access token for LinkedIn authentication');
+    return this.convertTokenToCookie(accessToken);
+  }
+  
+  /**
+   * Convert token to cookie (placeholder method)
+   */
+  private convertTokenToCookie(token: string): string {
+    console.log('Note: In production, this would make an actual call to convert the token to a cookie');
+    // In a real implementation, this would make an authenticated call to LinkedIn
+    // or use a headless browser to extract the cookie after authenticating with the token
     
-    // For now, return a placeholder to allow development
-    return "placeholder_session_cookie_for_dev";
+    // For development, return the token in a format similar to a cookie
+    return `li_at=${token}`;
   }
 }
 

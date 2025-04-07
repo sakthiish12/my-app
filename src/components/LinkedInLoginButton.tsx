@@ -139,7 +139,11 @@ export default function LinkedInLoginButton({
       url.searchParams.append('client_id', clientId);
       url.searchParams.append('redirect_uri', redirectUri);
       url.searchParams.append('state', state);
-      url.searchParams.append('scope', 'r_liteprofile r_emailaddress');
+      
+      // Use OpenID Connect scopes instead of LinkedIn API scopes
+      url.searchParams.append('scope', 'openid profile email');
+      
+      console.log("LinkedIn Auth URL:", url.toString());
       
       setAuthUrl(url.toString());
     } catch (err) {

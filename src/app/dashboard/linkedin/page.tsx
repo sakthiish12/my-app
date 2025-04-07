@@ -86,14 +86,19 @@ export default function LinkedInPage() {
           redirectUri: localStorage.getItem('linkedin_redirect_uri') || (window.location.origin + '/dashboard/linkedin')
         }),
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Token exchange response status:', response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log('Token exchange response:', data);
         if (data.status === 'success') {
           setOauthSuccess(true);
           // After successful authentication, fetch analytics
           fetchAnalytics();
         } else {
           setError(data.error || 'Failed to authenticate with LinkedIn');
+          console.error('LinkedIn authentication error details:', data.details || 'No detailed error information');
         }
       })
       .catch(err => {
