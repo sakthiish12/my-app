@@ -1,55 +1,68 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-const isProd = process.env.NODE_ENV === 'production';
-
-// Only require MongoDB URI in production or if explicitly provided
-if (isProd && !MONGODB_URI) {
-  console.warn('MongoDB URI not defined. Some functionality will be limited.');
+// Declare global variables to cache the connection
+declare global {
+  var mongoose: {
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
+  };
 }
 
-interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-}
-
-// @ts-ignore - global augmentation
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
-
+// Initialize global mongoose object if it doesn't exist
 if (!global.mongoose) {
-  // @ts-ignore - global augmentation
-  global.mongoose = cached;
+  global.mongoose = {
+    conn: null,
+    promise: null,
+  };
 }
 
-async function connectToDatabase() {
-  // Return early if no MongoDB URI is provided
-  if (!MONGODB_URI) {
-    console.warn('No MongoDB URI provided. Database operations will fail.');
+/**
+ * Connect to MongoDB using Mongoose
+ */
+async function connectToDatabase(): Promise<typeof mongoose | null> {
+  try {
+    // If we already have a connection, return it
+    if (global.mongoose.conn) {
+      return global.mongoose.conn;
+    }
+
+    // If a connection is in progress, return the promise
+    if (!global.mongoose.promise) {
+      const MONGODB_URI = process.env.MONGODB_URI;
+
+      if (!MONGODB_URI) {
+        console.error('Please define the MONGODB_URI environment variable');
+        return null;
+      }
+
+      // Set up mongoose connection with best practices
+      const options = {
+        autoIndex: true, // Build indexes
+        maxPoolSize: 10, // Maintain up to 10 socket connections
+        serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      };
+
+      // Create new promise for the connection
+      global.mongoose.promise = mongoose.connect(MONGODB_URI, options)
+        .then((mongoose) => {
+          console.log('Connected to MongoDB');
+          return mongoose;
+        })
+        .catch((error) => {
+          console.error('Error connecting to MongoDB:', error);
+          global.mongoose.promise = null;
+          throw error;
+        });
+    }
+
+    // Store the connection and return it
+    global.mongoose.conn = await global.mongoose.promise;
+    return global.mongoose.conn;
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
     return null;
   }
-
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then(() => {
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
 }
 
 export default connectToDatabase; 

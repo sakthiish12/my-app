@@ -7,6 +7,9 @@ export default authMiddleware({
     "/sign-in",
     "/sign-up",
     "/pricing",
+    "/login/linkedin",
+    "/api/auth/linkedin/callback",
+    "/test-env"
   ],
   // Routes that can be accessed while signed in or signed out
   ignoredRoutes: [

@@ -14,6 +14,10 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  env: {
+    NEXT_PUBLIC_LINKEDIN_CLIENT_ID: process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+  },
 };
 
 module.exports = nextConfig; 
