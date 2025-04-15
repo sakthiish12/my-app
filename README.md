@@ -4,11 +4,45 @@ AI-powered pricing intelligence for social media creators. SocioPrice analyzes y
 
 ## Features
 
-- Social media platform integration (Instagram, Facebook, TikTok, LinkedIn, YouTube, Twitter, Pinterest, Threads)
+- Social media platform integration (LinkedIn)
 - AI-powered audience analysis
 - Dynamic pricing recommendations
 - Real-time market trend analysis
 - Integration with popular creator tools
+
+## Project Structure
+
+```
+socioprice/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── dashboard/
+│   │   ├── sign-in/
+│   │   ├── sign-up/
+│   │   ├── page.tsx
+│   │   ├── layout.tsx
+│   │   └── globals.css
+│   ├── components/
+│   │   └── Sidebar.tsx
+│   ├── lib/
+│   │   ├── db.ts
+│   │   ├── pricingEngine.ts
+│   │   └── redis.ts
+│   ├── models/
+│   │   ├── User.ts
+│   │   └── PricingData.ts
+│   ├── types/
+│   │   ├── global.d.ts
+│   │   └── social.ts
+│   └── tests/
+│       └── api.test.ts
+├── public/
+│   ├── window.svg
+│   ├── globe.svg
+│   └── file.svg
+└── config files...
+```
 
 ## Tech Stack
 
@@ -18,6 +52,8 @@ AI-powered pricing intelligence for social media creators. SocioPrice analyzes y
 - **State Management**: Zustand
 - **Form Handling**: React Hook Form, Zod
 - **API Integration**: Axios
+- **Database**: MongoDB
+- **Caching**: Redis
 
 ## Getting Started
 
@@ -48,10 +84,19 @@ Create a `.env.local` file in the root directory with the following variables:
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# LinkedIn OAuth
+LINKEDIN_CLIENT_ID=your_linkedin_client_id
+LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+
+# Database
+MONGODB_URI=your_mongodb_uri
+
+# Redis
+REDIS_URL=your_redis_url
+
+# Base URL
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
 4. Run the development server:
@@ -62,6 +107,22 @@ yarn dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Environment Files
+
+- `.env.local` - Local development
+- `.env.production` - Production settings
+- `.env.test` - Testing configuration
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage
 
 ## Deployment
 
@@ -111,4 +172,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-For support, email support@socioprice.com or join our Discord community.
+For support, email support@socioprice.com

@@ -16,7 +16,6 @@
   "dependencies": {
     "@clerk/nextjs": "^4.29.9",
     "axios": "^1.6.7",
-    "critters": "^0.0.23",
     "mongodb": "^6.3.0",
     "mongoose": "^8.2.2",
     "next": "^14.2.25",
