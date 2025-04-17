@@ -2,20 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import querystring from 'querystring';
 import axios from 'axios';
 import { cookies } from 'next/headers';
-import {
-  LINKEDIN_CLIENT_ID,
-  LINKEDIN_CLIENT_SECRET,
-  LINKEDIN_REDIRECT_URI,
-} from "@/lib/linkedin";
+import { LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, LINKEDIN_REDIRECT_URI } from '@/lib/linkedin';
 
 /**
  * LinkedIn OAuth callback handler
- * This matches the callback URL set in the auth URL generation:
- * https://socioprice.com/api/auth/linkedin/callback (production)
- * http://localhost:3000/api/auth/linkedin/callback (development)
+ * This is the EXACT path LinkedIn redirects to after authentication:
+ * https://socioprice.com/api/auth/callback/linkedin (production)
+ * http://localhost:3000/api/auth/callback/linkedin (development)
+ * 
+ * This must match the redirect_uri in the LinkedIn developer dashboard and in the authorization request.
  */
 export async function GET(request: NextRequest) {
-  console.log('LinkedIn callback handler accessed at /api/auth/linkedin/callback');
+  console.log('LinkedIn callback handler accessed at /api/auth/callback/linkedin', { 
+    url: request.url,
+    searchParams: Object.fromEntries(request.nextUrl.searchParams.entries())
+  });
   
   try {
     // Get search params from the request URL
@@ -73,9 +74,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange authorization code for access token
-    console.log('[LinkedIn Callback] Exchanging code for token...', {
-      redirectUri: LINKEDIN_REDIRECT_URI
-    });
+    console.log('[LinkedIn Callback] Exchanging code for token...');
     
     const tokenResponse = await axios.post(
       'https://www.linkedin.com/oauth/v2/accessToken',
@@ -138,13 +137,10 @@ export async function GET(request: NextRequest) {
       email: userData.email
     });
     
-    // Store the access token in a secure cookie
-    cookies().set('linkedin_access_token', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: expires_in,
-      path: '/',
-    });
+    // In a production app, you would now:
+    // 1. Create or update the user in your database
+    // 2. Set authentication cookies or tokens
+    // 3. Redirect to the appropriate page
     
     return createHtmlResponse(true, {
       title: 'Authentication Successful',
@@ -270,7 +266,7 @@ function createHtmlResponse(success: boolean, options: {
             setTimeout(() => window.close(), 500);
           } else {
             // If no opener, redirect to the main application
-            window.location.href = '/dashboard';
+            window.location.href = '${process.env.NEXT_PUBLIC_BASE_URL || '/'}';
           }
         }
         

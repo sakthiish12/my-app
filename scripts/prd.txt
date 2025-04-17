@@ -1,0 +1,238 @@
+<context>
+# Overview  
+SocioPrice is a web application designed to help social media influencers optimize their digital product pricing. The platform solves the challenge of determining the optimal price point for digital products (courses, e-books, templates, etc.) based on an influencer's unique audience demographics and engagement. By analyzing follower data across multiple platforms, SocioPrice provides data-driven pricing recommendations that maximize conversion rates and revenue.
+
+# Core Features  
+## Social Media Integration
+- What it does: Connects to multiple social media platforms to gather audience data
+- Why it's important: Provides accurate demographic and engagement information about an influencer's audience
+- How it works: Uses OAuth authentication and platform APIs to securely access follower data from Instagram, LinkedIn, TikTok, Facebook, Twitter, Pinterest, and more
+
+## Audience Analysis
+- What it does: Analyzes follower demographics, engagement patterns, and geographic distribution
+- Why it's important: Understanding audience composition is critical for appropriate pricing
+- How it works: Processes social data through ML algorithms to segment audience by income levels, geographic regions, engagement frequency, and platform-specific metrics
+
+## Price Optimization Engine
+- What it does: Generates optimal price points or price ranges for different digital product types
+- Why it's important: Takes the guesswork out of pricing decisions to maximize conversions
+- How it works: Uses proprietary algorithms that factor in audience demographics, product type, comparable market offerings, and platform-specific conversion patterns
+
+## Product Category Templates
+- What it does: Provides pre-configured templates for common digital product categories
+- Why it's important: Simplifies the process for influencers to get quick recommendations for specific product types
+- How it works: Offers structured input forms for courses, e-books, templates, coaching sessions, planners, subscriptions, software, digital art, and tutorials
+
+## Dashboard & Analytics
+- What it does: Presents pricing recommendations, audience insights, and performance tracking
+- Why it's important: Gives influencers a central place to manage pricing strategy across products
+- How it works: Visual interface with charts, recommendations, and the ability to track actual sales performance against predicted outcomes
+
+# User Experience  
+## User Personas
+- Professional Influencers: Content creators with 50K+ followers looking to monetize their audience
+- Emerging Creators: Those with 10K-50K followers seeking to launch their first digital products
+- Social Business Owners: Small businesses with social media presence launching digital offerings
+
+## Key User Flows
+- Account Creation & Social Connection: Users create an account and connect their social platforms
+- Audience Analysis: System processes follower data and presents demographic insights
+- Product Creation: User inputs details about their digital product type and specifications
+- Price Recommendation: System generates optimal pricing strategy with supporting data
+- Results Tracking: User inputs actual sales results to refine future recommendations
+
+## UI/UX Considerations
+- Mobile-First Design: Accessible across devices as many influencers manage on mobile
+- Visual Data Presentation: Clear graphs and visualizations for audience demographics
+- Guided Workflow: Step-by-step process from account creation to final recommendation
+- Platform-Specific Insights: Tailored views for each connected social platform
+- Actionable Recommendations: Clear pricing guidance with supporting rationale
+</context>
+<PRD>
+# Technical Architecture  
+## System Components
+- Frontend: React-based SPA with responsive design using Next.js and Tailwind CSS
+- Backend: Node.js API server with Express
+- Authentication: Clerk for user authentication and OAuth social connections
+- Data Processing: Dedicated services for social media data extraction and analysis
+- Analytics Engine: Price optimization algorithms and recommendation system
+- Database: MongoDB for user profiles, product information, and pricing history
+- Caching: Redis for performance optimization of frequently accessed data
+
+## Data Models
+- User Model: Account information, subscription status, preferences
+- Social Profiles: Connected platforms, authentication tokens, refresh mechanisms
+- Audience Data: Demographic information, engagement metrics, segmentation
+- Product Catalog: User's digital product details, specifications, and categories
+- Pricing History: Historical recommendations, actual results, performance metrics
+- Analytics: Optimization parameters, algorithm configurations, performance data
+
+## APIs and Integrations
+- Social Media APIs: Instagram, LinkedIn, TikTok, Facebook, Twitter, Pinterest
+- Payment Processing: Stripe for subscription billing
+- Analytics: Internal analytics engine with potential for Google Analytics integration
+- Notification: Email service (SendGrid) for alerts and recommendations
+
+## Infrastructure Requirements
+- Hosting: Cloud-based infrastructure (AWS or similar)
+- Scaling: Auto-scaling capabilities for data processing during peak usage
+- Security: End-to-end encryption for user data, compliance with platform API policies
+- Monitoring: Performance and error tracking systems
+- Backup: Regular automated backups of all user and analytical data
+
+# Development Roadmap  
+## MVP Requirements
+- User Authentication and Profile Management
+  - Email/password registration and login
+  - Basic profile creation
+  - OAuth connection for at least three major platforms (Instagram, LinkedIn, TikTok)
+
+- Basic Audience Analysis
+  - Demographic data collection from connected platforms
+  - Geographic distribution visualization
+  - Basic engagement metrics display
+
+- Simple Price Recommendation
+  - Support for three initial product types: courses, e-books, coaching
+  - Basic pricing algorithm based on audience location and size
+  - Single price point recommendation with confidence rating
+
+- Minimal Viable Dashboard
+  - Overview of connected platforms and audience size
+  - Price recommendations for configured products
+  - Simple data visualizations
+
+## Future Enhancements
+- Advanced Audience Analysis
+  - Income-level estimation algorithms
+  - Engagement quality scoring
+  - Audience interest categorization
+  - Cross-platform audience overlap detection
+
+- Expanded Product Categories
+  - Support for all planned product types
+  - Category-specific pricing factors
+  - Competitive analysis within niches
+
+- Enhanced Price Optimization
+  - Price range recommendations with testing strategy
+  - Regional/country-specific pricing options
+  - Seasonal adjustment recommendations
+  - A/B testing recommendations for price points
+
+- Advanced Dashboard & Analytics
+  - Performance tracking against recommendations
+  - Sales conversion analytics
+  - Revenue optimization suggestions
+  - Audience growth correlation with pricing strategy
+
+- Community & Marketplace Features
+  - Anonymized industry benchmarks
+  - Best practices sharing
+  - Expert pricing consultation connections
+
+# Logical Dependency Chain
+## Foundation Components (Build First)
+1. User Authentication System
+   - Registration, login, profile management
+   - Social platform OAuth connections
+
+2. Social Media Data Connectors
+   - API integration for data retrieval
+   - Data normalization across platforms
+   - Storage schema and initial processing
+
+3. Basic Data Processing Pipeline
+   - Demographic data extraction
+   - Geographic analysis
+   - Engagement metrics calculation
+
+## Quick Win Visual Components
+4. Basic Dashboard UI
+   - Connected accounts overview
+   - Audience visualization
+   - Product configuration interface
+
+5. Simple Product Configuration Flow
+   - Product type selection
+   - Basic details input
+   - Initial pricing recommendation display
+
+## Core Functionality Components
+6. Price Optimization Engine (Basic)
+   - Core algorithm implementation
+   - Geographic and demographic factors
+   - Product type consideration
+
+7. Results Tracking System
+   - Sales performance input
+   - Recommendation accuracy metrics
+   - Basic adjustment mechanisms
+
+## Enhancement Components
+8. Advanced Audience Analytics
+   - Cross-platform analysis
+   - Time-series engagement patterns
+   - Interest and behavior segmentation
+
+9. Enhanced Price Optimization
+   - Machine learning model integration
+   - Multi-factor analysis
+   - Dynamic recommendation adjustments
+
+10. Extended Product Categories
+    - Template-based configuration for all types
+    - Category-specific algorithms
+    - Competitive positioning factors
+
+# Risks and Mitigations  
+## Technical Challenges
+- Risk: Social media API limitations and changes
+  Mitigation: Implement robust error handling, fallback mechanisms, and regular API monitoring
+
+- Risk: Data processing scalability with large follower counts
+  Mitigation: Implement sampling techniques, asynchronous processing, and optimized algorithms
+
+- Risk: Accuracy of pricing recommendations
+  Mitigation: Start with conservative models, gather user feedback, and continuously refine algorithms
+
+## MVP Scope Management
+- Risk: Feature creep extending development timeline
+  Mitigation: Strict prioritization of core features, clear MVP definition, and phased approach
+
+- Risk: Overengineering the initial solution
+  Mitigation: Focus on solving the core pricing problem well before adding complexity
+
+## Resource Constraints
+- Risk: Development team bandwidth limitations
+  Mitigation: Modular architecture allowing parallel development, leveraging existing libraries
+
+- Risk: Social media data access costs
+  Mitigation: Efficient data caching, selective data gathering, and optimization of API calls
+
+## User Adoption Challenges
+- Risk: User skepticism about pricing recommendations
+  Mitigation: Transparent explanation of factors, confidence ratings, and success stories
+
+- Risk: Social platform connection hesitancy
+  Mitigation: Clear privacy policies, data usage explanations, and minimal permission requirements
+
+# Appendix  
+## Market Research
+- Existing pricing tools focus primarily on physical products rather than digital offerings
+- Social media influencers typically underprice their digital products by 20-40%
+- Geographic price sensitivity varies significantly across regions (e.g., pricing that works in the US may be too high for Southeast Asian audiences)
+- Conversion rates drop significantly when pricing exceeds certain thresholds relative to audience demographics
+
+## Pricing Factors by Product Category
+- Courses: Duration, depth, niche specificity, competition, creator authority
+- E-Books: Length, uniqueness, visual elements, creator reputation, niche demand
+- Templates: Complexity, time savings, customization options, design quality
+- Coaching: Time commitment, exclusivity, expertise level, market rates
+- Planners: Complexity, design quality, customization, utility period
+
+## Technical Specifications
+- Audience Analysis Metrics: Engagement rate, geographic distribution, platform activity patterns, demographic estimates
+- Price Optimization Variables: Audience income levels, geographic purchasing power, product category benchmarks, creator authority score
+- Data Refresh Requirements: Follower demographics (weekly), engagement metrics (daily), pricing recommendations (on-demand)
+</PRD> 

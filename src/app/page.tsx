@@ -74,11 +74,11 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16 py-16">
             <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Social-First Pricing Intelligence
+              Optimal Pricing for Digital Creators
             </h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              SocioPrice uses AI to analyze your audience demographics and engagement metrics,
-              delivering personalized pricing recommendations that maximize your revenue.
+              PeakPrice analyzes your social media audience demographics to recommend the perfect price
+              point for your digital products, maximizing sales conversion and revenue.
             </p>
             <button
               className="inline-block px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:opacity-90 transition-all shadow-lg hover:shadow-xl text-lg font-medium"
@@ -94,22 +94,52 @@ export default function Home() {
               <div className="text-indigo-600 mb-4 text-4xl font-bold">01</div>
               <h3 className="text-xl font-semibold mb-3 text-gray-800">Connect Your Platforms</h3>
               <p className="text-gray-600 leading-relaxed">
-                Seamlessly integrate with your favorite social media and content platforms for comprehensive audience analysis.
+                Link your social media accounts or enter your profile URLs to analyze follower demographics and purchasing power by region.
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all">
               <div className="text-indigo-600 mb-4 text-4xl font-bold">02</div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">AI-Powered Analysis</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">Smart Audience Analysis</h3>
               <p className="text-gray-600 leading-relaxed">
-                Our AI analyzes engagement patterns, demographic data, and market trends to understand your audience's value perception.
+                Our AI examines regional distribution, spending patterns, and engagement metrics to determine optimal price points for each product type.
               </p>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all">
               <div className="text-indigo-600 mb-4 text-4xl font-bold">03</div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-800">Smart Recommendations</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-800">Conversion-Optimized Pricing</h3>
               <p className="text-gray-600 leading-relaxed">
-                Get data-driven pricing strategies and dynamic recommendations that evolve with your audience.
+                Get custom pricing recommendations that balance revenue and conversion rates, with different pricing strategies for each product type.
               </p>
+            </div>
+          </div>
+
+          {/* Digital Products Section */}
+          <div className="mb-16">
+            <h3 className="text-2xl font-bold mb-8 text-center text-gray-800">
+              Digital Products We Support
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { name: 'Online Courses', icon: '🎓' },
+                { name: 'E-Books', icon: '📚' },
+                { name: 'Templates', icon: '📋' },
+                { name: 'Coaching', icon: '🗣️' },
+                { name: 'Digital Planners', icon: '📅' },
+                { name: 'Subscriptions', icon: '🔄' },
+                { name: 'Software', icon: '💻' },
+                { name: 'Digital Art', icon: '🎨' },
+                { name: 'Tutorials', icon: '📝' },
+                { name: 'Presets', icon: '📷' },
+                { name: 'Worksheets', icon: '📊' },
+                { name: 'Webinars', icon: '🎬' },
+              ].map((product) => (
+                <div key={product.name} 
+                  className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-3"
+                >
+                  <span className="text-2xl">{product.icon}</span>
+                  <span className="font-medium text-gray-700">{product.name}</span>
+                </div>
+              ))}
             </div>
           </div>
 

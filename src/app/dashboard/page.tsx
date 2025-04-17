@@ -17,7 +17,7 @@ export default async function DashboardPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Welcome, {user.firstName || 'Creator'}! 👋</h1>
         <p className="text-gray-600">
-          Let's optimize your pricing strategy with AI-powered insights.
+          Get AI-powered price optimization for your digital products based on your social media audience.
         </p>
       </div>
 
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
             <h2 className="text-xl font-semibold">Connect Platforms</h2>
           </div>
           <p className="text-gray-600 mb-4">
-            Start by connecting your social media accounts to analyze your audience.
+            Connect your social media accounts or enter your profile URLs to analyze your follower demographics.
           </p>
           <Link
             href="/dashboard/linkedin"
@@ -47,11 +47,11 @@ export default async function DashboardPage() {
             <h2 className="text-xl font-semibold">Select Product</h2>
           </div>
           <p className="text-gray-600 mb-4">
-            Choose your digital product type for targeted recommendations.
+            Choose your digital product type to get tailored pricing recommendations that maximize sales conversion.
           </p>
           <Link
             href="/dashboard/analyze"
-            className="inline-block w-full px-4 py-2 bg-gray-100 text-gray-500 text-center rounded-md cursor-not-allowed"
+            className="inline-block w-full px-4 py-2 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition-colors"
           >
             Choose Product Type
           </Link>
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
             <h2 className="text-xl font-semibold">Get Insights</h2>
           </div>
           <p className="text-gray-600 mb-4">
-            Receive AI-powered pricing recommendations based on your audience.
+            Receive optimal pricing recommendations and conversion estimates based on your audience demographics.
           </p>
           <Link
             href="/dashboard/insights"
@@ -80,10 +80,14 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-semibold mb-4">Available Platforms</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { name: 'LinkedIn', status: 'available', href: '/dashboard/linkedin' },
-            { name: 'Instagram', status: 'coming_soon' },
-            { name: 'TikTok', status: 'coming_soon' },
-            { name: 'YouTube', status: 'coming_soon' },
+            { name: 'LinkedIn', status: 'available', href: '/dashboard/linkedin' as string },
+            { name: 'Instagram', status: 'coming_soon', href: '#' as string },
+            { name: 'TikTok', status: 'coming_soon', href: '#' as string },
+            { name: 'YouTube', status: 'coming_soon', href: '#' as string },
+            { name: 'Facebook', status: 'coming_soon', href: '#' as string },
+            { name: 'Twitter', status: 'coming_soon', href: '#' as string },
+            { name: 'Threads', status: 'coming_soon', href: '#' as string },
+            { name: 'Pinterest', status: 'coming_soon', href: '#' as string },
           ].map((platform) => (
             <div
               key={platform.name}
@@ -100,6 +104,35 @@ export default async function DashboardPage() {
               ) : (
                 <span className="text-sm text-gray-500">Coming Soon</span>
               )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Digital Products Section */}
+      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        <h2 className="text-xl font-semibold mb-4">Digital Product Types</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { name: 'Online Courses', description: 'Educational content series' },
+            { name: 'E-Books', description: 'Digital books and guides' },
+            { name: 'Templates', description: 'Reusable designs and assets' },
+            { name: 'Coaching', description: 'Virtual consultation sessions' },
+            { name: 'Planners', description: 'Digital planning tools' },
+            { name: 'Subscriptions', description: 'Recurring membership content' },
+            { name: 'Software', description: 'Apps and digital tools' },
+            { name: 'Digital Art', description: 'Downloadable art and designs' },
+            { name: 'Tutorials', description: 'Step-by-step guides' },
+            { name: 'Presets', description: 'Photo/video editing filters' },
+            { name: 'Worksheets', description: 'Interactive learning materials' },
+            { name: 'Webinars', description: 'Recorded presentations' },
+          ].map((product) => (
+            <div
+              key={product.name}
+              className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+            >
+              <h3 className="font-medium">{product.name}</h3>
+              <p className="text-sm text-gray-500">{product.description}</p>
             </div>
           ))}
         </div>
