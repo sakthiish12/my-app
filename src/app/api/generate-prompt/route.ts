@@ -1,9 +1,24 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+export const runtime = 'edge';
+
 export async function POST() {
   try {
-    // Ensure OpenAI API key is set
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const cacheKey = 'daily-prompt-' + today;
+
+    // Try to get the prompt from cache first
+    const cache = await caches.open('daily-prompt-cache');
+    const cachedResponse = await cache.match(cacheKey);
+    
+    if (cachedResponse) {
+      const data = await cachedResponse.json();
+      return NextResponse.json({ prompt: data.prompt });
+    }
+
+    // If not in cache, generate new prompt
     const openaiApiKey = process.env.OPENAI_API_KEY;
     
     if (!openaiApiKey) {
@@ -49,6 +64,18 @@ Stay concise but impactful. Your goal is to challenge my perspective and spark g
     if (!generatedPrompt) {
       throw new Error('Failed to generate prompt');
     }
+
+    // Store in cache
+    const promptData = { prompt: generatedPrompt, date: today };
+    await cache.put(
+      cacheKey,
+      new Response(JSON.stringify(promptData), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, s-maxage=86400' // Cache for 24 hours
+        }
+      })
+    );
     
     return NextResponse.json({ prompt: generatedPrompt });
     

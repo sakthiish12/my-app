@@ -29,22 +29,6 @@ export default function Home() {
   // Function to fetch a prompt from OpenAI's API
   const fetchAIPrompt = async () => {
     try {
-      // Attempt to fetch from local storage first (to avoid unnecessary API calls)
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-      const cachedData = localStorage.getItem('dailyPrompt');
-      
-      if (cachedData) {
-        const { date, promptText } = JSON.parse(cachedData);
-        // If we have a cached prompt for today, use it
-        if (date === today) {
-          setPrompt(promptText);
-          setError('');
-          setIsLoading(false);
-          return;
-        }
-      }
-      
-      // Otherwise, call the API
       const response = await fetch('/api/generate-prompt', {
         method: 'POST',
         headers: {
@@ -59,12 +43,6 @@ export default function Home() {
       const data = await response.json();
       setPrompt(data.prompt);
       setError('');
-      
-      // Cache the response in localStorage with today's date
-      localStorage.setItem('dailyPrompt', JSON.stringify({
-        date: today,
-        promptText: data.prompt
-      }));
       
     } catch (error) {
       console.error('Error fetching prompt:', error);
