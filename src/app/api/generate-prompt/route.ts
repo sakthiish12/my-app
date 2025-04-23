@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { neon, neonConfig } from '@neondatabase/serverless';
 
 export const runtime = 'nodejs';
-export const maxDuration = 10; // Extend timeout to 10 seconds
+export const maxDuration = 300; // 5 minutes in seconds
 
 // Configure Neon to use SSL
 neonConfig.fetchConnectionCache = true;
@@ -90,11 +90,13 @@ CRITICAL: Return ONLY the quoted meta-prompt. No explanations. No analysis. No a
       ],
       temperature: 0.85,
       max_tokens: 60
+    }).catch((error) => {
+      console.error('OpenAI API error:', error);
+      throw new Error(error.message || 'Failed to generate prompt from OpenAI');
     });
     
-    
     // Extract the generated prompt
-    const generatedPrompt = response.choices[0]?.message?.content?.trim();
+    const generatedPrompt = response?.choices[0]?.message?.content?.trim();
     
     if (!generatedPrompt) {
       throw new Error('Failed to generate prompt');

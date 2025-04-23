@@ -27,18 +27,19 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Function to fetch a prompt from OpenAI's API
-  const fetchAIPrompt = async () => {
+  const fetchAIPrompt = async (regenerate = false) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/generate-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({ regenerate })
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch prompt');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
@@ -59,47 +60,29 @@ export default function Home() {
     }
   };
 
+  // Initialize dark mode
   useEffect(() => {
-    // Fetch the AI-generated prompt
-    fetchAIPrompt();
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedMode = localStorage.getItem('darkMode');
+    setDarkMode(savedMode !== null ? savedMode === 'true' : isDarkMode);
     
-    // Check user's preferred color scheme
-    if (typeof window !== 'undefined') {
-      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setDarkMode(isDarkMode);
-      
-      // Add listener for changes in color scheme preference
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
-      mediaQuery.addEventListener('change', handleChange);
-      
-      // Check if user has a saved preference
-      const savedMode = localStorage.getItem('darkMode');
-      if (savedMode !== null) {
-        setDarkMode(savedMode === 'true');
-      }
-      
-      // Add a small delay to trigger the animation
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 300);
-      
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Fetch prompt on mount
+  useEffect(() => {
+    fetchAIPrompt();
+    setTimeout(() => setIsLoaded(true), 300);
   }, []);
   
+  // Apply dark mode class
   useEffect(() => {
-    // Apply dark mode class to document
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Save preference to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('darkMode', darkMode.toString());
-    }
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
 
   const copyToClipboard = () => {
