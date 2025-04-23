@@ -1,24 +1,46 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { neon, neonConfig } from '@neondatabase/serverless';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
+export const maxDuration = 10; // Extend timeout to 10 seconds
+
+// Configure Neon to use SSL
+neonConfig.fetchConnectionCache = true;
+
+// Initialize Neon client with the pooled connection
+const sql = neon(process.env.DATABASE_URL!);
+
+// Ensure table exists
+sql`
+  CREATE TABLE IF NOT EXISTS daily_prompts (
+    id SERIAL PRIMARY KEY,
+    prompt TEXT NOT NULL,
+    date DATE NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  )
+`.catch(error => {
+  console.error('Error creating table:', error);
+  // Table might already exist, so we can continue
+});
 
 export async function POST() {
   try {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
-    const cacheKey = 'daily-prompt-' + today;
 
-    // Try to get the prompt from cache first
-    const cache = await caches.open('daily-prompt-cache');
-    const cachedResponse = await cache.match(cacheKey);
+    // Try to get today's prompt from the database
+    const existingPrompt = await sql`
+      SELECT prompt FROM daily_prompts 
+      WHERE date = ${today}::date
+      LIMIT 1
+    `;
     
-    if (cachedResponse) {
-      const data = await cachedResponse.json();
-      return NextResponse.json({ prompt: data.prompt });
+    if (existingPrompt.length > 0) {
+      return NextResponse.json({ prompt: existingPrompt[0].prompt });
     }
 
-    // If not in cache, generate new prompt
+    // If not in database, generate new prompt
     const openaiApiKey = process.env.OPENAI_API_KEY;
     
     if (!openaiApiKey) {
@@ -65,17 +87,17 @@ Stay concise but impactful. Your goal is to challenge my perspective and spark g
       throw new Error('Failed to generate prompt');
     }
 
-    // Store in cache
-    const promptData = { prompt: generatedPrompt, date: today };
-    await cache.put(
-      cacheKey,
-      new Response(JSON.stringify(promptData), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'public, s-maxage=86400' // Cache for 24 hours
-        }
-      })
-    );
+    try {
+      // Store in database
+      await sql`
+        INSERT INTO daily_prompts (prompt, date)
+        VALUES (${generatedPrompt}, ${today}::date)
+      `;
+    } catch (dbError) {
+      console.error('Error storing prompt in database:', dbError);
+      // Even if storage fails, return the generated prompt
+      return NextResponse.json({ prompt: generatedPrompt });
+    }
     
     return NextResponse.json({ prompt: generatedPrompt });
     
