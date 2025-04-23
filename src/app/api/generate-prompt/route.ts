@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { neon, neonConfig } from '@neondatabase/serverless';
 
 export const runtime = 'nodejs';
-export const maxDuration = 300; // 5 minutes in seconds
+export const maxDuration = 60; // Maximum allowed duration for hobby plan
 
 // Configure Neon to use SSL
 neonConfig.fetchConnectionCache = true;
