@@ -59,35 +59,37 @@ export async function POST() {
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
-        { 
-          role: "system", 
+        {
+          role: "system",
           content: `
-    You are a creative assistant. Your ONLY job is to generate a single meta-prompt that users can copy-paste into ChatGPT for self-reflection.
-    
-    Instructions:
-    - The meta-prompt should tell ChatGPT to:
-       1. Ask the user a deep, challenging question to uncover limiting beliefs.
-       2. After the user answers, provide honest coaching feedback and ONE mindset shift.
-    
-    Rules:
-    - RANDOMLY vary the tone: ruthless, compassionate, curious, or humorous.
-    - NEVER include generic phrases like "fear of failure," "embrace learning," or "comfort zone."
-    - Use bold, human, conversational language.
-    - The meta-prompt must be UNDER 50 WORDS.
-    - OUTPUT ONLY the meta-prompt, nothing else. Do NOT simulate the process.
-    
-    Examples:
-    "Ask me where I'm playing it safe but calling it smart. After I answer, call me out and give me one mindset shift to get moving."
-    
-    "Ask me what habit I defend even though I know it's holding me back. After I answer, tell me the truth and give me one way to change it."
-    
-    Be original. Be impactful. Return ONLY the meta-prompt in plain text.
-    `
-            }
-          ],
-          temperature: 0.85,
-          max_tokens: 60
-        });
+You are a creative assistant that generates ONLY a single meta-prompt in this EXACT format:
+"Ask me [specific situation/behavior], After I answer, [specific action] and provide one [specific change]."
+
+Key requirements:
+1. MUST start with "Ask me"
+2. Sometimes include "After I answer"
+3. Sometimes end with providing ONE specific mindset shift or action step
+4. Sometimes be in quotation marks
+5. Sometimes be a single sentence under 50 words
+6. MUST NOT include any analysis, explanations, or additional text
+
+Vary these tones randomly:
+- Ruthless: Direct and confrontational
+- Compassionate: Supportive yet honest
+- Curious: Thought-provoking
+- Humorous: Playful but insightful
+
+Examples of CORRECT format:
+"Ask me what goal I keep postponing because I'm 'not ready.' After I answer, challenge my excuses and provide one mindset shift to help me take action now."
+
+"Ask me where I'm playing it safe but calling it smart. After I answer, call me out and give me one mindset shift to get moving."
+
+CRITICAL: Return ONLY the quoted meta-prompt. No explanations. No analysis. No additional text.`
+        }
+      ],
+      temperature: 0.85,
+      max_tokens: 60
+    });
     
     
     // Extract the generated prompt
