@@ -27,13 +27,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Function to fetch a prompt from OpenAI's API
-  const fetchAIPrompt = async () => {
+  const fetchAIPrompt = async (regenerate = false) => {
     try {
+      setIsLoading(true);
       const response = await fetch('/api/generate-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({ regenerate })
       });
       
       if (!response.ok) {
@@ -41,6 +43,11 @@ export default function Home() {
       }
       
       const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       setPrompt(data.prompt);
       setError('');
       
@@ -51,6 +58,10 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRegenerate = () => {
+    fetchAIPrompt(true);
   };
 
   useEffect(() => {
@@ -124,7 +135,7 @@ export default function Home() {
         )}
       </button>
       
-      <main className={`w-full max-w-2xl transform transition-all duration-700 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+      <main className={`w-full max-w-2xl mx-auto ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} transition-all duration-500`}>
         <header className="text-center mb-8 md:mb-12">
           <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${darkMode ? 'text-white' : 'bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'}`}>
             Daily Prompt
@@ -142,7 +153,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className={`p-6 rounded-xl border mb-6 transition-all hover:shadow-inner ${darkMode ? 'bg-gray-700/50 border-gray-600' : 'bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-100'}`}>
+          <div className="min-h-[100px]">
             {isLoading ? (
               <div className="flex justify-center items-center h-24">
                 <div className="animate-pulse flex space-x-2">
@@ -161,34 +172,50 @@ export default function Home() {
               </p>
             )}
           </div>
-          
-          <button
-            onClick={copyToClipboard}
-            disabled={isLoading || !!error}
-            className={`w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${(isLoading || !!error) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
-          >
-            <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
-            <span className="relative flex items-center">
-              {copied ? (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                  </svg>
-                  Copy prompt
-                </>
-              )}
-            </span>
-          </button>
+
+          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            <button
+              onClick={copyToClipboard}
+              disabled={isLoading || !!error}
+              className={`flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${(isLoading || !!error) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+            >
+              <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+              <span className="relative flex items-center">
+                {copied ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    Copy prompt
+                  </>
+                )}
+              </span>
+            </button>
+
+            <button
+              onClick={handleRegenerate}
+              disabled={isLoading}
+              className={`flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+            >
+              <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+              <span className="relative flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Regenerate
+              </span>
+            </button>
+          </div>
         </div>
         
-        <div className={`text-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+        <footer className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
           <p>A new prompt will be available tomorrow.</p>
           <div className="mt-4 flex flex-col items-center">
             <p>© {new Date().getFullYear()} Daily Prompt</p>
@@ -213,7 +240,7 @@ export default function Home() {
               </a>
             </p>
           </div>
-        </div>
+        </footer>
       </main>
     </div>
   );
