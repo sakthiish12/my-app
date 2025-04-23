@@ -27,15 +27,14 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Function to fetch a prompt from OpenAI's API
-  const fetchAIPrompt = async (regenerate = false) => {
+  const fetchAIPrompt = async () => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/generate-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ regenerate })
+        }
       });
       
       if (!response.ok) {
@@ -58,10 +57,6 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleRegenerate = () => {
-    fetchAIPrompt(true);
   };
 
   useEffect(() => {
@@ -173,11 +168,11 @@ export default function Home() {
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 mt-6">
+          <div className="mt-6">
             <button
               onClick={copyToClipboard}
               disabled={isLoading || !!error}
-              className={`flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${(isLoading || !!error) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+              className={`w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${(isLoading || !!error) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
             >
               <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
               <span className="relative flex items-center">
@@ -196,20 +191,6 @@ export default function Home() {
                     Copy prompt
                   </>
                 )}
-              </span>
-            </button>
-
-            <button
-              onClick={handleRegenerate}
-              disabled={isLoading}
-              className={`flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
-            >
-              <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
-              <span className="relative flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Regenerate
               </span>
             </button>
           </div>
