@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { neon, neonConfig } from '@neondatabase/serverless';
-
+import { Analytics } from "@vercel/analytics/react"
 export const runtime = 'nodejs';
 export const maxDuration = 60; // Maximum allowed duration for hobby plan
 
