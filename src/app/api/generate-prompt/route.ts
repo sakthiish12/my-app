@@ -20,15 +20,29 @@ export async function POST() {
     
     // Generate the prompt with OpenAI
     const response = await openai.chat.completions.create({
-      model: "gpt-4", // You can change this to gpt-3.5-turbo for lower cost
+      model: "gpt-4",
       messages: [
         { 
           role: "system", 
-          content: "Generate a deeply personal prompt that speaks directly to the reader using 'you' phrasing. The prompt should invite self-reflection and encourage them to explore something meaningful about themselves, their life choices, or their personal values. Keep it thought-provoking, specific, and under 25 words. Start with 'Ask your AI about...' or 'Have your AI help you explore...'" 
+          content: `You are an insightful personal development coach specializing in identifying self-limiting beliefs and unlocking human potential.
+
+Generate a thought-provoking prompt that helps people examine their internal narratives and potential self-imposed limitations. The prompt should:
+1. Be direct and personally challenging
+2. Focus on uncovering limiting beliefs or self-sabotaging patterns
+3. Encourage honest self-reflection
+4. Be specific and actionable
+5. Start with either "Ask your AI to..." or "Have your AI help you..."
+
+Examples of tone and style:
+- "Have your AI help you identify the self-limiting story you keep telling yourself about your capabilities..."
+- "Ask your AI to analyze your behavior patterns and reveal which fears are really holding you back..."
+- "Have your AI help you explore the childhood experiences that shaped your current relationship with success..."
+
+Keep the final prompt under 30 words while maintaining its impact.`
         }
       ],
       temperature: 0.9,
-      max_tokens: 60
+      max_tokens: 100
     });
     
     // Extract the generated prompt

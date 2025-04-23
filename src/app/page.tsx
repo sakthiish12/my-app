@@ -2,20 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-// Fallback prompts in case API call fails
-const fallbackPrompts = [
-  "Ask your AI about the core values that have guided your most important life decisions.",
-  "Have your AI help you explore how your childhood experiences shaped your current fears and strengths.",
-  "Ask your AI about what your daily habits reveal about your true priorities in life.",
-  "Have your AI help you identify the stories you tell yourself that might be limiting your potential.",
-  "Ask your AI about the pattern in your relationships that you've never fully acknowledged.",
-  "Have your AI help you explore what success truly means to you, not to others around you.",
-  "Ask your AI about the dream you've abandoned and whether it's time to reconsider it.",
-  "Have your AI help you discover which aspects of your identity were chosen by you versus inherited.",
-  "Ask your AI about what your spending habits reveal about your deepest values and fears.",
-  "Have your AI help you imagine your ideal day and what it reveals about your authentic self."
-];
-
 // Get the day of the year (1-366)
 const getDayOfYear = () => {
   const now = new Date();
@@ -34,6 +20,7 @@ const getDailySeed = () => {
 
 export default function Home() {
   const [prompt, setPrompt] = useState('');
+  const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -51,6 +38,7 @@ export default function Home() {
         // If we have a cached prompt for today, use it
         if (date === today) {
           setPrompt(promptText);
+          setError('');
           setIsLoading(false);
           return;
         }
@@ -70,6 +58,7 @@ export default function Home() {
       
       const data = await response.json();
       setPrompt(data.prompt);
+      setError('');
       
       // Cache the response in localStorage with today's date
       localStorage.setItem('dailyPrompt', JSON.stringify({
@@ -79,10 +68,8 @@ export default function Home() {
       
     } catch (error) {
       console.error('Error fetching prompt:', error);
-      // Use a fallback prompt based on the day if the API call fails
-      const seed = getDailySeed();
-      const fallbackIndex = seed % fallbackPrompts.length;
-      setPrompt(fallbackPrompts[fallbackIndex]);
+      setError('Unable to generate today\'s prompt. Please try again later.');
+      setPrompt('');
     } finally {
       setIsLoading(false);
     }
@@ -186,6 +173,10 @@ export default function Home() {
                   <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>
                 </div>
               </div>
+            ) : error ? (
+              <p className={`text-xl font-medium leading-relaxed ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
+                {error}
+              </p>
             ) : (
               <p className={`text-xl font-medium leading-relaxed ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
                 {prompt}
@@ -195,8 +186,8 @@ export default function Home() {
           
           <button
             onClick={copyToClipboard}
-            disabled={isLoading}
-            className={`w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
+            disabled={isLoading || !!error}
+            className={`w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center relative overflow-hidden group ${(isLoading || !!error) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}`}
           >
             <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
             <span className="relative flex items-center">
@@ -224,7 +215,17 @@ export default function Home() {
           <div className="mt-4 flex flex-col items-center">
             <p>© {new Date().getFullYear()} Daily Prompt</p>
             <p className="mt-2">
-              Made by <a 
+              Made by{" "}
+              <a 
+                href="https://www.linkedin.com/in/mustafarasheed/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-indigo-500 hover:text-indigo-400 font-medium"
+              >
+                @Mustafa Rasheed
+              </a>
+              {" & "}
+              <a 
                 href="https://www.linkedin.com/in/sakthiish-vijayadass/" 
                 target="_blank" 
                 rel="noopener noreferrer"
