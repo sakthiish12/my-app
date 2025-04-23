@@ -156,7 +156,7 @@ export default function Home() {
                 {error}
               </p>
             ) : (
-              <p className={`text-xl font-medium leading-relaxed ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+              <p className={`text-lg md:text-xl font-medium leading-relaxed ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
                 {prompt}
               </p>
             )}
