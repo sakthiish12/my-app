@@ -24,8 +24,9 @@ sql`
   // Table might already exist, so we can continue
 });
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const { regenerate } = await request.json();
     const now = new Date();
     const today = now.toISOString().split('T')[0];
 
@@ -36,11 +37,11 @@ export async function POST() {
       LIMIT 1
     `;
     
-    if (existingPrompt.length > 0) {
+    if (existingPrompt.length > 0 && !regenerate) {
       return NextResponse.json({ prompt: existingPrompt[0].prompt });
     }
 
-    // If not in database, generate new prompt
+    // If not in database or regenerate is true, generate new prompt
     const openaiApiKey = process.env.OPENAI_API_KEY;
     
     if (!openaiApiKey) {
@@ -100,11 +101,20 @@ CRITICAL: Return ONLY the quoted meta-prompt. No explanations. No analysis. No a
     }
 
     try {
-      // Store in database
-      await sql`
-        INSERT INTO daily_prompts (prompt, date)
-        VALUES (${generatedPrompt}, ${today}::date)
-      `;
+      if (regenerate) {
+        // Update existing prompt
+        await sql`
+          UPDATE daily_prompts 
+          SET prompt = ${generatedPrompt}
+          WHERE date = ${today}::date
+        `;
+      } else {
+        // Insert new prompt
+        await sql`
+          INSERT INTO daily_prompts (prompt, date)
+          VALUES (${generatedPrompt}, ${today}::date)
+        `;
+      }
     } catch (dbError) {
       console.error('Error storing prompt in database:', dbError);
       // Even if storage fails, return the generated prompt
